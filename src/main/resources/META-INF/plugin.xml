@@ -1,0 +1,39 @@
+<idea-plugin>
+  <id>com.lauvinson.open.translation</id>
+  <name>YDTranslation for private</name>
+  <version>1.0</version>
+  <vendor email="wincentlauvinson@gmail.com" url="https://www.lauvinson.com">Vinson's OpenSources</vendor>
+
+  <description><![CDATA[
+      有道翻译私key版，个人key请至有道智云获取<br>
+      快捷键◜Alt + G ◞
+    ]]></description>
+
+  <change-notes><![CDATA[
+      初始化版本<br>
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+    <!-- Add your actions here -->
+    <action id="YDTranslation.TranslateAction" class="com.lauvinson.open.translation.TranslateAction"
+            text="YDTranslate" description="translate for private">
+      <add-to-group group-id="EditMenu" anchor="first"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="alt G"/>
+    </action>
+  </actions>
+
+</idea-plugin>
