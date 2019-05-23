@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.lauvinson.open.translation</id>
   <name>YDTranslation for private</name>
-  <version>1.0</version>
+  <version>1.0.1</version>
   <vendor email="wincentlauvinson@gmail.com" url="https://www.lauvinson.com">Vinson's OpenSources</vendor>
 
   <description><![CDATA[
@@ -10,7 +10,8 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      初始化版本<br>
+      😀添加有道翻译公有API接口<br>
+      😀添加JSON格式化输出<br>
     ]]>
   </change-notes>
 

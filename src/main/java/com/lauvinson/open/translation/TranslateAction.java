@@ -9,10 +9,13 @@ import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.JBColor;
+import com.lauvinson.open.translation.utils.HttpUtils;
+import com.lauvinson.open.translation.utils.JsonUtils;
 import org.apache.http.util.TextUtils;
 
 import java.awt.*;
-import java.util.Random;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 /**
  * @author created by vinson on 2019/5/22
@@ -38,7 +41,10 @@ public class TranslateAction extends AnAction {
         if (TextUtils.isEmpty(selectedText)) {
             return;
         }
-        showPopupBalloon(mEditor, randStr[new Random().nextInt(randStr.length - 1)]);
+//        showPopupBalloon(mEditor, randStr[new Random().nextInt(randStr.length - 1)]);
+        String response = JsonUtils.JsonFormart(HttpUtils.URLGet("http://fanyi.youdao.com/openapi.do?keyfrom=neverland&key=969918857&type=data&doctype=json&version=1.1&q=" + selectedText, new HashMap<>(), StandardCharsets.UTF_8.displayName()));
+        System.out.println(response);
+        showPopupBalloon(mEditor, response);
     }
 
     private void showPopupBalloon(final Editor editor, final String result) {

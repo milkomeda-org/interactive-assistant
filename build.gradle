@@ -10,7 +10,7 @@ plugins {
 }
 
 group 'com.lauvinson.open'
-version '1.0.0'
+version '1.0.1'
 
 sourceCompatibility = 1.8
 
@@ -37,4 +37,4 @@ patchPluginXml {
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
-}  
+}
