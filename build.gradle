@@ -27,12 +27,27 @@ dependencies {
 intellij {
     version '2019.1'
     plugins 'coverage' //Bundled plugin dependencies
-    pluginName 'YDTranslation'
+    pluginName 'Private quick word translation'
 }
 patchPluginXml {
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      <h3>v1.0.2</h3>
+      <ul>
+        <li>😀添加有道翻译公有API接口</li>
+        <li>😀添加JSON格式化输出</li>
+        <li>😀优化HTTP请求路径</li>
+      </ul>
+
+      <h3>v1.0.1</h3>
+      <ul>
+        <li>😀增加快捷键操作</li>
+      </ul>
+
+      <h3>v1.0.0</h3>
+      <ul>
+        <li>😀初始化</li>
+      </ul>
+      """
 }
 
 tasks.withType(JavaCompile) {

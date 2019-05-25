@@ -1,24 +1,36 @@
 <idea-plugin>
   <id>com.lauvinson.open.translation</id>
-  <name>YDTranslation for private</name>
+  <name>Private quick word translation</name>
   <version>1.0.2</version>
-  <vendor email="wincentlauvinson@gmail.com" url="https://www.lauvinson.com">Vinson's OpenSources</vendor>
+  <vendor email="wincentlauvinson@gmail.com" url="https://open.source.lauvinson.com">open.source.lauvinson.com</vendor>
 
   <description><![CDATA[
-      <strong>划词快捷翻译</strong><br>
-      有道翻译私key版，个人key请至有道智云获取<br>
-      快捷键◜Alt + G ◞
-      <br/>
-      <br/>
-      @author:vinson(<a href="mailto:wincentlauvinson@gmail.com">wincentlauvinson@gmail.com</a>)
-      <hr/>
-      more opprtunities in the future
+      <h3>Private quick word translation for IDEA.</h3>
+      <ul>
+        <li>快捷翻译私key版</li>
+        <li>快捷键◜Alt + G ◞</li>
+        <li>@author:vinson(<a href="mailto:wincentlauvinson@gmail.com">wincentlauvinson@gmail.com</a>)</li>
+        <li>more opprtunities in the future</li>
+      </ul>
     ]]></description>
 
   <change-notes><![CDATA[
-      😀添加有道翻译公有API接口<br>
-      😀添加JSON格式化输出<br>
-      😀优化HTTP请求路径
+      <h3>v1.0.2</h3>
+      <ul>
+        <li>😀添加有道翻译公有API接口</li>
+        <li>😀添加JSON格式化输出</li>
+        <li>😀优化HTTP请求路径</li>
+      </ul>
+
+      <h3>v1.0.1</h3>
+      <ul>
+        <li>😀增加快捷键操作</li>
+      </ul>
+
+      <h3>v1.0.0</h3>
+      <ul>
+        <li>😀初始化</li>
+      </ul>
     ]]>
   </change-notes>
 
@@ -37,8 +49,8 @@
 
   <actions>
     <!-- Add your actions here -->
-    <action id="YDTranslation.TranslateAction" class="com.lauvinson.open.translation.TranslateAction"
-            text="YDTranslate" description="translate for private">
+    <action id="Translation.TranslateAction" class="com.lauvinson.open.translation.TranslateAction"
+            text="Private quick word translation" description="Private quick word translation">
       <add-to-group group-id="EditMenu" anchor="first"/>
       <keyboard-shortcut keymap="$default" first-keystroke="alt G"/>
     </action>
