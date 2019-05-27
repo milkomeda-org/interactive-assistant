@@ -15,6 +15,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h3>v1.0.3</h3>
+      <ul>
+        <li>😀添加非传统插件依赖</li>
+        <li>😀使用Kotlin</li>
+      </ul>
+
       <h3>v1.0.2</h3>
       <ul>
         <li>😀添加有道翻译公有API接口</li>
