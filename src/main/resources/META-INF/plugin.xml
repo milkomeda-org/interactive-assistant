@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.lauvinson.open.translation</id>
   <name>Private quick word translation</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <vendor email="wincentlauvinson@gmail.com" url="https://open.source.lauvinson.com">open.source.lauvinson.com</vendor>
 
   <description><![CDATA[
