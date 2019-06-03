@@ -11,7 +11,7 @@ plugins {
 }
 
 group 'com.lauvinson.open'
-version '1.0.3'
+version '1.0.4'
 
 sourceCompatibility = 1.8
 
@@ -33,10 +33,15 @@ dependencies {
 intellij {
     version '2019.1'
     plugins 'coverage' //Bundled plugin dependencies
-    pluginName 'Private quick word translation'
+    pluginName 'Private interactive assistant'
 }
 patchPluginXml {
     changeNotes """
+      <h3>v1.0.4</h3>
+      <ul>
+        <li>😀更新插件名称</li>
+        <li>😀计划支持更高扩展能力</li>
+      </ul>
       <h3>v1.0.3</h3>
       <ul>
         <li>😀添加非传统插件依赖</li>

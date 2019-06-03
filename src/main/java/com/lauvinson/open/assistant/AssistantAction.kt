@@ -1,16 +1,15 @@
-package com.lauvinson.open.translation
+package com.lauvinson.open.assistant
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.SelectionModel
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.JBColor
-import com.lauvinson.open.translation.utils.HttpUtils
-import com.lauvinson.open.translation.utils.JsonUtils
+import com.lauvinson.open.assistant.utils.HttpUtils
+import com.lauvinson.open.assistant.utils.JsonUtils
 import org.apache.http.util.TextUtils
 
 import java.awt.*
@@ -20,7 +19,7 @@ import java.util.HashMap
 /**
  * @author created by vinson on 2019/5/22
  */
-class TranslateAction : AnAction() {
+class AssistantAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         // TODO: insert action logic here

@@ -1,4 +1,4 @@
-package com.lauvinson.open.translation.utils
+package com.lauvinson.open.assistant.utils
 
 object JsonUtils {
 
