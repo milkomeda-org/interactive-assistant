@@ -1,5 +1,5 @@
-# Private-interactive-assistant-for-IDEA
-<h3>Private interactive assistant for IDEA.</h3>
+# Private-interactive-assistant-for-IntelliJ
+<h3>Private interactive assistant for IntelliJ.</h3>
 <p>Using some proprietary transformation capability interfaces to provide more efficient and timely plugins, I will add more extensible functionality in the future.</p>
 <p>Support or Suggestions can be found at <a href="https://open.source.lauvinson.com">open.source.lauvinson.com</a></p>
 <hr />
