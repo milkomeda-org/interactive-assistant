@@ -11,7 +11,7 @@ plugins {
 }
 
 group 'com.lauvinson.open'
-version '1.0.4'
+version '0.0.3'
 
 sourceCompatibility = 1.8
 
@@ -37,32 +37,18 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      <h3>v1.0.4</h3>
+      <h3>v0.0.3</h3>
       <ul>
-        <li>😀更新插件名称</li>
-        <li>😀计划支持更高扩展能力</li>
+        <li>The program supports higher expansion capabilities</li>
       </ul>
-      <h3>v1.0.3</h3>
+      <h3>v0.0.2</h3>
       <ul>
-        <li>😀添加非传统插件依赖</li>
-        <li>😀使用Kotlin</li>
+        <li>Support Intellij full line products</li>
+        <li>Develop with Kotlin</li>
       </ul>
-
-      <h3>v1.0.2</h3>
+      <h3>v0.0.1</h3>
       <ul>
-        <li>😀添加有道翻译公有API接口</li>
-        <li>😀添加JSON格式化输出</li>
-        <li>😀优化HTTP请求路径</li>
-      </ul>
-
-      <h3>v1.0.1</h3>
-      <ul>
-        <li>😀增加快捷键操作</li>
-      </ul>
-
-      <h3>v1.0.0</h3>
-      <ul>
-        <li>😀初始化</li>
+        <li>Release the</li>
       </ul>
       """
 }
