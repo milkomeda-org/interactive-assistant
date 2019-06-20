@@ -46,6 +46,11 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
+    <!-- service -->
+    <applicationService serviceInterface="com.lauvinson.open.assistant.configuration.SettingsConfiguration"
+                        serviceImplementation="com.lauvinson.open.assistant.configuration.SettingsConfiguration" />
+    <!-- settings panel -->
+    <applicationConfigurable instance="com.lauvinson.open.assistant.settings.Setting" />
   </extensions>
 
   <actions>
