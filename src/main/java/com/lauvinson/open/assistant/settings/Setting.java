@@ -2,15 +2,21 @@ package com.lauvinson.open.assistant.settings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.ui.components.JBList;
+import com.intellij.ui.table.JBTable;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
+import com.lauvinson.open.assistant.utils.CollectionUtils;
 import javafx.util.Pair;
 import org.apache.commons.lang3.RandomUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -23,9 +29,16 @@ public class Setting implements Configurable {
     private static final String DISPLAY_NAME = "Interactive Assistant";
     private static Vector<Pair<Object, Map<String, String>>> group = new Vector<>();
 
-    public Setting() {
-        initComponents();
-    }
+    private JPanel root;
+    private JButton addButton;
+    private JScrollPane groupPanel;
+    private JLabel abilityMapLabel;
+    private JLabel groupLabel;
+    private JList<Object> groupList;
+    private JButton removeButton;
+    private JPanel top;
+    private JTable mapTabel;
+
 
     @Nls
     @Override
@@ -86,14 +99,14 @@ public class Setting implements Configurable {
     private void updateUi() {
         Object[] groups = group.stream().map(Pair::getKey).toArray();
         this.groupList.setListData(groups);
-        groupList.updateUI();
+        this.groupList.updateUI();
     }
 
     private void updateAbilityUi(int groupIndex) {
         Pair<Object, Map<String, String>> abilitys = group.get(groupIndex);
-        String[] abilityKeys = abilitys.getValue().keySet().toArray(new String[]{});
-        abilityMapList.setListData(abilityKeys);
-        abilityMapList.updateUI();
+        Object[][] ability = CollectionUtils.getMapKeyValue(abilitys.getValue());
+        this.mapTabel.setModel(new AbilityTableModel(ability));
+        this.mapTabel.updateUI();
     }
 
     private String doubleClick(Object value) {
@@ -106,132 +119,101 @@ public class Setting implements Configurable {
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
+        mapTabel = new JBTable(new AbilityTableModel());
     }
 
-    private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        createUIComponents();
 
-        root = new JPanel();
-        groupLabel = new JLabel();
-        abilityMapLabel = new JLabel();
-        groupPanel = new JScrollPane();
-        groupList = new JList();
-        abilityMapList = new JList();
-        mapPanel = new JScrollPane();
-        JPanel panel1 = new JPanel();
-        addButton = new JButton();
-        removeButton = new JButton();
-        Spacer vSpacer1 = new Spacer();
-        JPanel panel2 = new JPanel();
+    class AbilityTableModel extends AbstractTableModel {
+        // 表格中第一行所要显示的内容存放在字符串数组columnNames中
+        String[] abilityColumnNames = { "Name", "Pass"};
+        // 表格中各行的内容保存在二维数组data中
+        Object[][] data;
 
-        //======== root ========
-        {
-            root.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
+        // 下述方法是重写AbstractTableModel中的方法，其主要用途是被JTable对象调用，以便在表格中正确的显示出来。程序员必须根据采用的数据类型加以恰当实现。
 
-            //---- groupLabel ----
-            groupLabel.setText("Group");
-            root.add(groupLabel, new GridConstraints(0, 0, 1, 1,
-                GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
-                GridConstraints.SIZEPOLICY_FIXED,
-                GridConstraints.SIZEPOLICY_FIXED,
-                null, null, null));
 
-            //---- abilityMapLabel ----
-            abilityMapLabel.setText("Ability Map");
-            root.add(abilityMapLabel, new GridConstraints(2, 0, 1, 1,
-                GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
-                GridConstraints.SIZEPOLICY_FIXED,
-                GridConstraints.SIZEPOLICY_FIXED,
-                null, null, null));
-
-            //======== groupPanel ========
-            {
-
-                //---- groupList ----
-                groupList.setSelectionMode(2);
-                groupPanel.setViewportView(groupList);
-            }
-            root.add(groupPanel, new GridConstraints(1, 0, 1, 1,
-                GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH,
-                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW | GridConstraints.SIZEPOLICY_WANT_GROW,
-                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW | GridConstraints.SIZEPOLICY_WANT_GROW,
-                null, null, null));
-
-            //======== mapPanel ========
-            {
-                mapPanel.setViewportView(abilityMapList);
-            }
-            root.add(mapPanel, new GridConstraints(3, 0, 1, 1,
-                GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH,
-                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW | GridConstraints.SIZEPOLICY_WANT_GROW,
-                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW | GridConstraints.SIZEPOLICY_WANT_GROW,
-                null, null, null));
-
-            //======== panel1 ========
-            {
-                panel1.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
-
-                //---- addButton ----
-                addButton.setDoubleBuffered(false);
-                addButton.setFocusCycleRoot(false);
-                addButton.setFocusTraversalPolicyProvider(false);
-                addButton.setHideActionText(false);
-                addButton.setHorizontalTextPosition(0);
-                addButton.setIcon(new ImageIcon(getClass().getResource("/general/add.png")));
-                addButton.setText("");
-                addButton.setVerticalAlignment(0);
-                addButton.putClientProperty("hideActionText", false);
-                addButton.putClientProperty("html.disable", false);
-                panel1.add(addButton, new GridConstraints(0, 0, 1, 1,
-                    GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL,
-                    GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                    GridConstraints.SIZEPOLICY_FIXED,
-                    null, null, null));
-
-                //---- removeButton ----
-                removeButton.setEnabled(false);
-                removeButton.setIcon(new ImageIcon(getClass().getResource("/general/remove.png")));
-                removeButton.setText("");
-                panel1.add(removeButton, new GridConstraints(1, 0, 1, 1,
-                    GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL,
-                    GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                    GridConstraints.SIZEPOLICY_FIXED,
-                    null, null, null));
-                panel1.add(vSpacer1, new GridConstraints(2, 0, 1, 1,
-                    GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL,
-                    GridConstraints.SIZEPOLICY_CAN_SHRINK,
-                    GridConstraints.SIZEPOLICY_CAN_GROW | GridConstraints.SIZEPOLICY_WANT_GROW,
-                    null, null, null));
-            }
-            root.add(panel1, new GridConstraints(1, 1, 1, 1,
-                GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH,
-                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                null, null, null));
-
-            //======== panel2 ========
-            {
-                panel2.setLayout(new BorderLayout());
-            }
-            root.add(panel2, new GridConstraints(3, 1, 1, 1,
-                GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH,
-                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                null, null, null));
+        AbilityTableModel() {
         }
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents
+
+        AbilityTableModel(Object[][] data) {
+            this.data = data;
+        }
+
+        // 获得列的数目
+        @Override
+        public int getColumnCount() {
+            return abilityColumnNames.length;
+        }
+
+        // 获得行的数目
+        @Override
+        public int getRowCount() {
+            return data.length;
+        }
+
+        // 获得某列的名字，而目前各列的名字保存在字符串数组columnNames中
+        @Override
+        public String getColumnName(int col) {
+            return abilityColumnNames[col];
+        }
+
+        // 获得某行某列的数据，而数据保存在对象数组data中
+        @Override
+        public Object getValueAt(int row, int col) {
+            return data[row][col];
+        }
+
+        // 判断每个单元格的类型
+        @Override
+        public Class getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+
+        // 将表格声明为可编辑的
+        @Override
+        public boolean isCellEditable(int row, int col) {
+
+            if (col < 2) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        // 改变某个数据的值
+        @Override
+        public void setValueAt(Object value, int row, int col) {
+
+            if (data[0][col] instanceof Integer && !(value instanceof Integer)) {
+                try {
+                    data[row][col] = new Integer(value.toString());
+                    fireTableCellUpdated(row, col);
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(root, "The \""
+                            + getColumnName(col)
+                            + "\" column accepts only integer values.");
+                }
+            } else {
+                data[row][col] = value;
+                fireTableCellUpdated(row, col);
+            }
+
+        }
+
+        private void printDebugData() {
+            int numRows = getRowCount();
+            int numCols = getColumnCount();
+
+            for (int i = 0; i < numRows; i++) {
+                System.out.print(" row " + i + ":");
+                for (int j = 0; j < numCols; j++) {
+                    System.out.print(" " + data[i][j]);
+                }
+                System.out.println();
+            }
+            System.out.println("--------------------------");
+        }
     }
 
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JPanel root;
-    private JLabel groupLabel;
-    private JLabel abilityMapLabel;
-    private JScrollPane groupPanel;
-    private JList<Object> groupList;
-    private JScrollPane mapPanel;
-    private JList<String> abilityMapList;
-    private JButton addButton;
-    private JButton removeButton;
-    // JFormDesigner - End of variables declaration  //GEN-END:variables
+
 }
