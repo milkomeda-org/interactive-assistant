@@ -6,12 +6,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 public class Setting implements Configurable {
@@ -25,6 +19,7 @@ public class Setting implements Configurable {
     private JLabel groupLabel;
     private JList groupList;
     private JList abilityMapList;
+    private JButton removeButton;
 
     @Nls
     @Override
@@ -56,14 +51,19 @@ public class Setting implements Configurable {
 
     private void initListener() {
         addButton.addActionListener(e -> {
-            Vector<String> dataVector = new Vector<>();
+            Vector<JTextField> dataVector = new Vector<>();
             ListModel listDataModel = this.groupList.getModel();
             for (int i = 0; i < listDataModel.getSize(); i++) {
-                String s = (String) listDataModel.getElementAt(i);
+                JTextField s = (JTextField) listDataModel.getElementAt(i);
                 dataVector.add(s);
             }
-            dataVector.add("new");
+            JTextField textField = new JTextField(5);
+            dataVector.add(textField);
             this.groupList.setListData(dataVector);
         });
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }
