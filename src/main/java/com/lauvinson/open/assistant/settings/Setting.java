@@ -1,11 +1,14 @@
 package com.lauvinson.open.assistant.settings;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.table.JBTable;
-import com.lauvinson.open.assistant.configuration.SettingsConfiguration;
+import com.lauvinson.open.assistant.configuration.Config;
+import com.lauvinson.open.assistant.configuration.ConfigService;
 import com.lauvinson.open.assistant.utils.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,8 +21,11 @@ import java.util.UUID;
 
 public class Setting implements Configurable {
 
-    private SettingsConfiguration.AbilityMap abilityMap = SettingsConfiguration.Companion.getINSTANCE().getAbilityMap();
-    private LinkedHashMap<String, LinkedHashMap<String, String>> group = new LinkedHashMap<>(abilityMap.getApi());
+    private ConfigService configService = ServiceManager.getService(ConfigService.class);
+    private Config config = configService.getState();
+    private LinkedHashMap<String, LinkedHashMap<String, String>> group = new LinkedHashMap<String, LinkedHashMap<String, String>>() {{
+        putAll(config.api);
+    }};
 
     private static final String DISPLAY_NAME = "Interactive Assistant";
 
@@ -49,15 +55,13 @@ public class Setting implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !abilityMap.getApi().equals(group);
+        return !config.api.equals(group);
     }
 
     @Override
     public void apply() throws ConfigurationException {
         //set config
-        if (this.isModified()) {
-            abilityMap.setApi(group);
-        }
+        config.api = group;
     }
 
     private void loadSettings() {
@@ -79,7 +83,6 @@ public class Setting implements Configurable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(groupList.getSelectedIndex() != -1) {
-                    int selectIndex = groupList.locationToIndex(e.getPoint());
                     Object oldValue = groupList.getSelectedValue();
                     if (1 == e.getClickCount()) {
                         // show map
@@ -87,8 +90,10 @@ public class Setting implements Configurable {
                     }
                     if(e.getClickCount() == 2) {
                         String newValue = doubleClick(oldValue);
-                        group.put(newValue, group.remove(oldValue));
-                        updateGroupUi();
+                        if (StringUtils.isNotBlank(newValue)) {
+                            group.put(newValue, group.remove(oldValue));
+                            updateGroupUi();
+                        }
                     }
                 }
             }
@@ -106,6 +111,17 @@ public class Setting implements Configurable {
         Object[][] ability = CollectionUtils.getMapKeyValue(abilitys);
         this.mapTabel.setModel(new AbilityTableModel(ability));
         this.mapTabel.updateUI();
+    }
+
+    private void changeAbilityKey(String oldk, String newk) {
+        Object select = groupList.getSelectedValue().toString();
+        String oldv = group.get(select).remove(oldk);
+        group.get(select).put(newk, oldv);
+    }
+
+    private void changeAbilityValue(String key, String value) {
+        Object select = groupList.getSelectedValue().toString();
+        group.get(select).put(key, value);
     }
 
     private String doubleClick(Object value) {
@@ -171,18 +187,12 @@ public class Setting implements Configurable {
         // 将表格声明为可编辑的
         @Override
         public boolean isCellEditable(int row, int col) {
-
-            if (col < 2) {
-                return false;
-            } else {
-                return true;
-            }
+            return true;
         }
 
         // 改变某个数据的值
         @Override
         public void setValueAt(Object value, int row, int col) {
-
             if (data[0][col] instanceof Integer && !(value instanceof Integer)) {
                 try {
                     data[row][col] = new Integer(value.toString());
@@ -193,6 +203,16 @@ public class Setting implements Configurable {
                             + "\" column accepts only integer values.");
                 }
             } else {
+                switch (col) {
+                    case 0:
+                        changeAbilityKey(data[row][0].toString(), value.toString());
+                        break;
+                    case 1:
+                        changeAbilityValue(data[row][0].toString(), value.toString());
+                        break;
+                    default:
+                        break;
+                }
                 data[row][col] = value;
                 fireTableCellUpdated(row, col);
             }
