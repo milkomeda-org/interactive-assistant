@@ -2,32 +2,26 @@ package com.lauvinson.open.assistant.settings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
+import com.lauvinson.open.assistant.configuration.SettingsConfiguration;
 import com.lauvinson.open.assistant.utils.CollectionUtils;
-import javafx.util.Pair;
 import org.apache.commons.lang3.RandomUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
+import java.util.LinkedHashMap;
+import java.util.UUID;
 
 public class Setting implements Configurable {
 
+    private SettingsConfiguration.AbilityMap abilityMap = SettingsConfiguration.Companion.getINSTANCE().getAbilityMap();
+    private LinkedHashMap<String, LinkedHashMap<String, String>> group = new LinkedHashMap<>(abilityMap.getApi());
+
     private static final String DISPLAY_NAME = "Interactive Assistant";
-    private static Vector<Pair<Object, Map<String, String>>> group = new Vector<>();
 
     private JPanel root;
     private JButton addButton;
@@ -55,26 +49,30 @@ public class Setting implements Configurable {
 
     @Override
     public boolean isModified() {
-        return false;
+        return !abilityMap.getApi().equals(group);
     }
 
     @Override
     public void apply() throws ConfigurationException {
         //set config
+        if (this.isModified()) {
+            abilityMap.setApi(group);
+        }
     }
 
     private void loadSettings() {
         //load xml file to the panel
+        this.updateGroupUi();
         this.initListener();
     }
 
     private void initListener() {
         addButton.addActionListener(e -> {
-            Map<String, String> value = new HashMap<String, String>(1){{
+            LinkedHashMap<String, String> value = new LinkedHashMap<String, String>(1){{
                 put(String.valueOf(RandomUtils.nextInt(0, 9999)), String.valueOf(RandomUtils.nextInt(0, 9999)));
             }};
-            group.add(new Pair<>("new", value));
-            updateUi();
+            group.put(UUID.randomUUID().toString(), value);
+            updateGroupUi();
         });
 
         groupList.addMouseListener(new MouseAdapter() {
@@ -82,29 +80,30 @@ public class Setting implements Configurable {
             public void mouseClicked(MouseEvent e) {
                 if(groupList.getSelectedIndex() != -1) {
                     int selectIndex = groupList.locationToIndex(e.getPoint());
+                    Object oldValue = groupList.getSelectedValue();
                     if (1 == e.getClickCount()) {
                         // show map
-                        updateAbilityUi(selectIndex);
+                        updateAbilityUi(oldValue);
                     }
                     if(e.getClickCount() == 2) {
-                        String newValue = doubleClick(groupList.getSelectedValue());
-                        group.setElementAt(new Pair<>(newValue, group.get(selectIndex).getValue()), selectIndex);
-                        updateUi();
+                        String newValue = doubleClick(oldValue);
+                        group.put(newValue, group.remove(oldValue));
+                        updateGroupUi();
                     }
                 }
             }
         });
     }
 
-    private void updateUi() {
-        Object[] groups = group.stream().map(Pair::getKey).toArray();
+    private void updateGroupUi() {
+        Object[] groups = group.keySet().toArray();
         this.groupList.setListData(groups);
         this.groupList.updateUI();
     }
 
-    private void updateAbilityUi(int groupIndex) {
-        Pair<Object, Map<String, String>> abilitys = group.get(groupIndex);
-        Object[][] ability = CollectionUtils.getMapKeyValue(abilitys.getValue());
+    private void updateAbilityUi(Object key) {
+        LinkedHashMap<String, String> abilitys = group.get(key);
+        Object[][] ability = CollectionUtils.getMapKeyValue(abilitys);
         this.mapTabel.setModel(new AbilityTableModel(ability));
         this.mapTabel.updateUI();
     }

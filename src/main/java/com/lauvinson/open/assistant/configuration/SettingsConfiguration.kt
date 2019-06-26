@@ -15,7 +15,7 @@ import java.util.HashMap
 @State(name = "private-interactive-assistant", storages = [Storage(value = "\$APP_CONFIG$/private-interactive-assistant_settings.xml")])
 class SettingsConfiguration : PersistentStateComponent<SettingsConfiguration.AbilityMap> {
 
-    private val abilityMap = AbilityMap()
+    val abilityMap = AbilityMap(LinkedHashMap())
 
     override fun getState(): AbilityMap? {
         return this.abilityMap
@@ -29,10 +29,7 @@ class SettingsConfiguration : PersistentStateComponent<SettingsConfiguration.Abi
      * Ability mirror
      * @author created by vinson on 2019/6/20
      */
-    class AbilityMap {
-        /** alias - api  */
-        private val api = HashMap<String, String>()
-    }
+    class AbilityMap(var api: LinkedHashMap<String, LinkedHashMap<String, String>>)
 
     companion object {
 
