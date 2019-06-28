@@ -1,5 +1,6 @@
 package com.lauvinson.open.assistant.utils;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -20,5 +21,22 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
             }
         }
         return object;
+    }
+
+    public static void mapCopy(HashMap<Object, HashMap<Object, Object>> paramsMap, HashMap<Object, HashMap<Object, Object>> resultMap) {
+        if (resultMap == null) {
+            resultMap = new HashMap<>(paramsMap.size());
+        }
+        if (paramsMap == null) {
+            return;
+        }
+        HashMap secon;
+        for (Object o : paramsMap.entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
+            Object key = entry.getKey();
+            secon = new HashMap<>(paramsMap.get(key).size());
+            secon.putAll(paramsMap.get(key));
+            resultMap.put(key, secon);
+        }
     }
 }

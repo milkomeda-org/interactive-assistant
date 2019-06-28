@@ -26,9 +26,9 @@ object HttpUtils {
     //使用这个对象简单来说就是为了不去考虑多线程带来安全的问题
     private var connectionManager: MultiThreadedHttpConnectionManager? = null
     //将参数提取成变量，方便以后修改
-    private val connectionTimeOut = 25000
+    private val connectionTimeOut = 5000
 
-    private val socketTimeOut = 25000
+    private val socketTimeOut = 5000
 
     private val maxConnectionPerHost = 20
 
@@ -138,6 +138,8 @@ object HttpUtils {
         try {
             getMethod = GetMethod(strtTotalURL.toString())
             getMethod.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=$enc")
+            getMethod.setRequestHeader("Host", url)
+            getMethod.setRequestHeader("Refresh", url)
             //执行getMethod
             val statusCode = client!!.executeMethod(getMethod)
             if (statusCode == HttpStatus.SC_OK) {

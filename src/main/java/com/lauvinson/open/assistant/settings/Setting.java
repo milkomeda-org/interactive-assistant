@@ -17,17 +17,15 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class Setting implements Configurable {
 
     private ConfigService configService = ServiceManager.getService(ConfigService.class);
     private Config config = configService.getState();
-    private LinkedHashMap<String, LinkedHashMap<String, String>> group = new LinkedHashMap<String, LinkedHashMap<String, String>>() {{
-        putAll(config.api);
-    }};
-    private static final Object[][] emptTtwoDimensionArray = new Object[0][0];
+    private static final Object[][] EMPT_TTWO_DIMENSION_ARRAY = new Object[0][0];
+    private HashMap<Object, HashMap<Object, Object>> group = new HashMap<>();
 
     private static final String DISPLAY_NAME = "Interactive Assistant";
 
@@ -51,13 +49,14 @@ public class Setting implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
+        CollectionUtils.mapCopy(config.getApi(), this.group);
         this.loadSettings();
         return this.root;
     }
 
     @Override
     public boolean isModified() {
-        boolean modify = !config.api.equals(group);
+        boolean modify = !config.getApi().equals(group);
         if (modify) {
             Group.Companion.init();
         }
@@ -67,7 +66,9 @@ public class Setting implements Configurable {
     @Override
     public void apply() throws ConfigurationException {
         //set config
-        config.api = group;
+        HashMap<Object, HashMap<Object, Object>> temp = new HashMap<>(this.group.size());
+        CollectionUtils.mapCopy(this.group, temp);
+        config.setApi(temp);
     }
 
     private void loadSettings() {
@@ -78,7 +79,7 @@ public class Setting implements Configurable {
 
     private void initListener() {
         addButton.addActionListener(e -> {
-            LinkedHashMap<String, String> value = new LinkedHashMap<String, String>(1){{
+            HashMap<Object, Object> value = new HashMap<Object, Object>(1) {{
                 put(String.valueOf(RandomUtils.nextInt(0, 9999)), String.valueOf(RandomUtils.nextInt(0, 9999)));
             }};
             group.put(UUID.randomUUID().toString(), value);
@@ -88,7 +89,7 @@ public class Setting implements Configurable {
         removeButton.addActionListener(e -> {
             Object select = groupList.getSelectedValue();
             group.remove(select.toString());
-            updateAbilityUi(emptTtwoDimensionArray);
+            updateAbilityUi(EMPT_TTWO_DIMENSION_ARRAY);
             updateGroupUi();
         });
 
@@ -100,7 +101,7 @@ public class Setting implements Configurable {
                     if (1 == e.getClickCount()) {
                         removeButton.setEnabled(true);
                         // show map
-                        LinkedHashMap<String, String> abilitys = group.get(oldValue.toString());
+                        HashMap<Object, Object> abilitys = group.get(oldValue.toString());
                         Object[][] ability = CollectionUtils.getMapKeyValue(abilitys);
                         updateAbilityUi(ability);
                     }
@@ -128,9 +129,9 @@ public class Setting implements Configurable {
         this.mapTabel.updateUI();
     }
 
-    private void changeAbilityKey(String oldk, String newk) {
+    private void changeAbilityKey(Object oldk, Object newk) {
         Object select = groupList.getSelectedValue().toString();
-        String oldv = group.get(select).remove(oldk);
+        Object oldv = group.get(select).remove(oldk);
         group.get(select).put(newk, oldv);
     }
 
