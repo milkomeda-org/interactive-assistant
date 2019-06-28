@@ -55,11 +55,16 @@
 
   <actions>
     <!-- Add your actions here -->
-    <action id="Assistant.Main" class="com.lauvinson.open.assistant.AssistantAction"
-            text="Private interactive assistant" description="Private interactive assistant">
-      <add-to-group group-id="EditMenu" anchor="first"/>
-      <keyboard-shortcut keymap="$default" first-keystroke="alt G"/>
-    </action>
+      <group id="ability" text="Private interactive assistant" popup="true">
+          <action id="Assistant.Main" class="com.lauvinson.open.assistant.AssistantAction"
+                  text="Private interactive assistant" description="Private interactive assistant">
+              <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+              <keyboard-shortcut keymap="$default" first-keystroke="alt G"/>
+          </action>
+      </group>
+      <group id="StudyAction.MyGroup" class="com.lauvinson.open.assistant.Group" text="Abilitys" popup="true">
+          <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+      </group>
   </actions>
 
 </idea-plugin>

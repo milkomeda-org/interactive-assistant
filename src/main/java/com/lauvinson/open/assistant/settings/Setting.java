@@ -4,6 +4,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.table.JBTable;
+import com.lauvinson.open.assistant.Group;
 import com.lauvinson.open.assistant.configuration.Config;
 import com.lauvinson.open.assistant.configuration.ConfigService;
 import com.lauvinson.open.assistant.utils.CollectionUtils;
@@ -26,6 +27,7 @@ public class Setting implements Configurable {
     private LinkedHashMap<String, LinkedHashMap<String, String>> group = new LinkedHashMap<String, LinkedHashMap<String, String>>() {{
         putAll(config.api);
     }};
+    private static final Object[][] emptTtwoDimensionArray = new Object[0][0];
 
     private static final String DISPLAY_NAME = "Interactive Assistant";
 
@@ -55,7 +57,11 @@ public class Setting implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !config.api.equals(group);
+        boolean modify = !config.api.equals(group);
+        if (modify) {
+            Group.Companion.init();
+        }
+        return modify;
     }
 
     @Override
@@ -79,19 +85,29 @@ public class Setting implements Configurable {
             updateGroupUi();
         });
 
+        removeButton.addActionListener(e -> {
+            Object select = groupList.getSelectedValue();
+            group.remove(select.toString());
+            updateAbilityUi(emptTtwoDimensionArray);
+            updateGroupUi();
+        });
+
         groupList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(groupList.getSelectedIndex() != -1) {
                     Object oldValue = groupList.getSelectedValue();
                     if (1 == e.getClickCount()) {
+                        removeButton.setEnabled(true);
                         // show map
-                        updateAbilityUi(oldValue);
+                        LinkedHashMap<String, String> abilitys = group.get(oldValue.toString());
+                        Object[][] ability = CollectionUtils.getMapKeyValue(abilitys);
+                        updateAbilityUi(ability);
                     }
                     if(e.getClickCount() == 2) {
                         String newValue = doubleClick(oldValue);
                         if (StringUtils.isNotBlank(newValue)) {
-                            group.put(newValue, group.remove(oldValue));
+                            group.put(newValue, group.remove(oldValue.toString()));
                             updateGroupUi();
                         }
                     }
@@ -106,10 +122,9 @@ public class Setting implements Configurable {
         this.groupList.updateUI();
     }
 
-    private void updateAbilityUi(Object key) {
-        LinkedHashMap<String, String> abilitys = group.get(key);
-        Object[][] ability = CollectionUtils.getMapKeyValue(abilitys);
-        this.mapTabel.setModel(new AbilityTableModel(ability));
+    private void updateAbilityUi(Object[][] data) {
+        ((AbilityTableModel) this.mapTabel.getModel()).setData(data);
+        this.groupList.updateUI();
         this.mapTabel.updateUI();
     }
 
@@ -148,6 +163,10 @@ public class Setting implements Configurable {
 
 
         AbilityTableModel() {
+        }
+
+        public void setData(Object[][] data) {
+            this.data = data;
         }
 
         AbilityTableModel(Object[][] data) {
