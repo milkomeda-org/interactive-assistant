@@ -18,9 +18,11 @@ import java.awt.Color
 import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.isNotEmpty
-import kotlin.collections.iterator
 
+/**
+ * @License Apache2
+ * @author created by vinson on 2019/6/28
+ */
 open class Group : ActionGroup() {
 
     private val config: Config? = ConfigService.getInstance().state
@@ -40,7 +42,7 @@ open class Group : ActionGroup() {
             for (m in config.api) {
                 for (u in m.value as HashMap<*, *>) {
                     u.key?.run {
-                        u.value?.run { list.add(ApiAction(m.key.toString() + ">" + u.key, u.value.toString())) }
+                        u.value?.run { list.add(ApiAction(m.key + ">" + u.key, u.value.toString())) }
                     }
                 }
             }

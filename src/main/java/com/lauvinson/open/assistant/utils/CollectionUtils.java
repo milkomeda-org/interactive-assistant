@@ -23,7 +23,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         return object;
     }
 
-    public static void mapCopy(HashMap<Object, HashMap<Object, Object>> paramsMap, HashMap<Object, HashMap<Object, Object>> resultMap) {
+    public static void mapCopy(HashMap<String, HashMap<String, String>> paramsMap, HashMap<String, HashMap<String, String>> resultMap) {
         if (resultMap == null) {
             resultMap = new HashMap<>(paramsMap.size());
         }
@@ -33,7 +33,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         HashMap secon;
         for (Object o : paramsMap.entrySet()) {
             Map.Entry entry = (Map.Entry) o;
-            Object key = entry.getKey();
+            String key = (String) entry.getKey();
             secon = new HashMap<>(paramsMap.get(key).size());
             secon.putAll(paramsMap.get(key));
             resultMap.put(key, secon);

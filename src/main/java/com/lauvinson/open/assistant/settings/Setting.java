@@ -25,7 +25,7 @@ public class Setting implements Configurable {
     private ConfigService configService = ServiceManager.getService(ConfigService.class);
     private Config config = configService.getState();
     private static final Object[][] EMPT_TTWO_DIMENSION_ARRAY = new Object[0][0];
-    private HashMap<Object, HashMap<Object, Object>> group = new HashMap<>();
+    private HashMap<String, HashMap<String, String>> group = new HashMap<>();
 
     private static final String DISPLAY_NAME = "Interactive Assistant";
 
@@ -66,7 +66,7 @@ public class Setting implements Configurable {
     @Override
     public void apply() throws ConfigurationException {
         //set config
-        HashMap<Object, HashMap<Object, Object>> temp = new HashMap<>(this.group.size());
+        HashMap<String, HashMap<String, String>> temp = new HashMap<>(this.group.size());
         CollectionUtils.mapCopy(this.group, temp);
         config.setApi(temp);
     }
@@ -79,7 +79,7 @@ public class Setting implements Configurable {
 
     private void initListener() {
         addButton.addActionListener(e -> {
-            HashMap<Object, Object> value = new HashMap<Object, Object>(1) {{
+            HashMap<String, String> value = new HashMap<String, String>(1) {{
                 put(String.valueOf(RandomUtils.nextInt(0, 9999)), String.valueOf(RandomUtils.nextInt(0, 9999)));
             }};
             group.put(UUID.randomUUID().toString(), value);
@@ -101,7 +101,7 @@ public class Setting implements Configurable {
                     if (1 == e.getClickCount()) {
                         removeButton.setEnabled(true);
                         // show map
-                        HashMap<Object, Object> abilitys = group.get(oldValue.toString());
+                        HashMap<String, String> abilitys = group.get(oldValue.toString());
                         Object[][] ability = CollectionUtils.getMapKeyValue(abilitys);
                         updateAbilityUi(ability);
                     }
@@ -129,9 +129,9 @@ public class Setting implements Configurable {
         this.mapTabel.updateUI();
     }
 
-    private void changeAbilityKey(Object oldk, Object newk) {
-        Object select = groupList.getSelectedValue().toString();
-        Object oldv = group.get(select).remove(oldk);
+    private void changeAbilityKey(String oldk, String newk) {
+        String select = groupList.getSelectedValue().toString();
+        String oldv = group.get(select).remove(oldk);
         group.get(select).put(newk, oldv);
     }
 
