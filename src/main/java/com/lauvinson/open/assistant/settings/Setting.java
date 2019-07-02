@@ -49,7 +49,7 @@ public class Setting implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        CollectionUtils.mapCopy(config.getApi(), this.group);
+        CollectionUtils.Companion.mapCopy(config.getApi(), this.group);
         this.loadSettings();
         return this.root;
     }
@@ -67,7 +67,7 @@ public class Setting implements Configurable {
     public void apply() throws ConfigurationException {
         //set config
         HashMap<String, HashMap<String, String>> temp = new HashMap<>(this.group.size());
-        CollectionUtils.mapCopy(this.group, temp);
+        CollectionUtils.Companion.mapCopy(this.group, temp);
         config.setApi(temp);
     }
 
@@ -102,7 +102,7 @@ public class Setting implements Configurable {
                         removeButton.setEnabled(true);
                         // show map
                         HashMap<String, String> abilitys = group.get(oldValue.toString());
-                        Object[][] ability = CollectionUtils.getMapKeyValue(abilitys);
+                        Object[][] ability = CollectionUtils.Companion.getMapKeyValue(abilitys);
                         updateAbilityUi(ability);
                     }
                     if(e.getClickCount() == 2) {

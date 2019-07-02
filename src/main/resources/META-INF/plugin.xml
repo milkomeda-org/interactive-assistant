@@ -51,6 +51,9 @@
                           serviceImplementation="com.lauvinson.open.assistant.configuration.ConfigService"/>
     <!-- settings panel -->
     <applicationConfigurable instance="com.lauvinson.open.assistant.settings.Setting" />
+    <!-- tool -->
+    <toolWindow id="Assistant" anchor="right" factoryClass="com.lauvinson.open.assistant.SearchToolWindowFactory"
+                icon="/icons/pluginicon.svg"/>
   </extensions>
 
   <actions>
