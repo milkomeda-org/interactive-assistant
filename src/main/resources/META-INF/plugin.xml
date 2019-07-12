@@ -47,20 +47,20 @@
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
     <!-- service -->
-      <applicationService serviceInterface="com.lauvinson.open.assistant.configuration.ConfigService"
-                          serviceImplementation="com.lauvinson.open.assistant.configuration.ConfigService"/>
+    <applicationService
+            serviceImplementation="com.lauvinson.open.assistant.configuration.ConfigService"/>
     <!-- settings panel -->
     <applicationConfigurable instance="com.lauvinson.open.assistant.settings.Setting" />
     <!-- tool -->
     <toolWindow id="Assistant" anchor="right" factoryClass="com.lauvinson.open.assistant.SearchToolWindowFactory"
-                icon="/icons/pluginicon.svg"/>
+                icon="/icons/pluginIcon.svg"/>
   </extensions>
 
   <actions>
     <!-- Add your actions here -->
-      <group id="ability" text="Private interactive assistant" popup="true">
+    <group id="ability" text="Private Interactive Assistant" popup="true">
           <action id="Assistant.Main" class="com.lauvinson.open.assistant.AssistantAction"
-                  text="Private interactive assistant" description="Private interactive assistant">
+                  text="Private Interactive Assistant" description="Private interactive assistant">
               <add-to-group group-id="EditorPopupMenu" anchor="first"/>
               <keyboard-shortcut keymap="$default" first-keystroke="alt G"/>
           </action>

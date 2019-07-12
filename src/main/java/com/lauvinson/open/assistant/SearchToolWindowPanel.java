@@ -29,13 +29,10 @@ import javax.swing.*;
 class SearchToolWindowPanel {
 
     private JPanel panel;
-    private JButton resetStatisticsButton;
     private JList html;
-    private JTextField text;
 
 
     SearchToolWindowPanel() {
-        resetStatisticsButton.addActionListener(e -> resetStats());
     }
 
     JPanel createToolWindowPanel() {
