@@ -11,7 +11,7 @@ plugins {
 }
 
 group 'com.lauvinson.source.open'
-version '0.0.5'
+version '0.0.6'
 
 sourceCompatibility = 1.8
 
@@ -32,14 +32,14 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2020.1'
+    version '2020.3'
     plugins 'coverage' //Bundled plugin dependencies
     pluginName 'Interactive Assistant'
     plugins 'terminal'
 }
 patchPluginXml {
     changeNotes """
-      <h3>v0.0.5</h3>
+      <h3>v0.0.6</h3>
       <ul>
         <li>supported exe and api</li>
       </ul>

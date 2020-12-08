@@ -24,7 +24,7 @@
 </ul>
 <hr />
 
-<h3>v0.0.5</h3>
+<h3>v0.0.6</h3>
 <ul>
 <li>supported exe and api</li>
 </ul>
