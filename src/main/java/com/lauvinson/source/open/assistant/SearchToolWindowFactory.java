@@ -1,4 +1,4 @@
-package com.lauvinson.open.assistant;
+package com.lauvinson.source.open.assistant;
 
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;

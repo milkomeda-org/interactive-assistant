@@ -1,4 +1,4 @@
-package com.lauvinson.open.assistant.utils
+package com.lauvinson.source.open.assistant.utils
 
 import java.util.*
 
@@ -22,10 +22,10 @@ class CollectionUtils : org.apache.commons.collections.CollectionUtils() {
             return `object`
         }
 
-        fun mapCopy(paramsMap: HashMap<String, HashMap<String, String>>?, target: HashMap<String, HashMap<String, String>>?) {
+        fun mapCopy(paramsMap: LinkedHashMap<String, LinkedHashMap<String, String>>?, target: LinkedHashMap<String, LinkedHashMap<String, String>>?) {
             var resultMap = target
             if (resultMap == null) {
-                resultMap = HashMap(paramsMap!!.size)
+                resultMap = LinkedHashMap(paramsMap!!.size)
             }
             if (paramsMap == null) {
                 return
@@ -34,7 +34,7 @@ class CollectionUtils : org.apache.commons.collections.CollectionUtils() {
             for (o in paramsMap.entries) {
                 val entry = o as Map.Entry<*, *>
                 val key = entry.key as String
-                secon = HashMap(paramsMap[key]?.size ?: 0)
+                secon = LinkedHashMap(paramsMap[key]?.size ?: 0)
                 paramsMap[key]?.let { secon.putAll(it) }
                 resultMap[key] = secon
             }

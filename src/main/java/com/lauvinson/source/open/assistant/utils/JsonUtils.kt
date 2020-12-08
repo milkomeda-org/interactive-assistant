@@ -1,4 +1,4 @@
-package com.lauvinson.open.assistant.utils
+package com.lauvinson.source.open.assistant.utils
 
 object JsonUtils {
 

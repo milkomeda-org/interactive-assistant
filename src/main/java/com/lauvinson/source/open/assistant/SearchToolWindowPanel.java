@@ -16,7 +16,7 @@
  * Equivalent description see [http://rem.mit-license.org/]
  */
 
-package com.lauvinson.open.assistant;
+package com.lauvinson.source.open.assistant;
 
 import javax.swing.*;
 

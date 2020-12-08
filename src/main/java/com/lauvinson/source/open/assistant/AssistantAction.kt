@@ -1,4 +1,4 @@
-package com.lauvinson.open.assistant
+package com.lauvinson.source.open.assistant
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -8,13 +8,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.JBColor
-import com.lauvinson.open.assistant.utils.HttpUtils
-import com.lauvinson.open.assistant.utils.JsonUtils
+import com.lauvinson.source.open.assistant.utils.HttpUtils
+import com.lauvinson.source.open.assistant.utils.JsonUtils
 import org.apache.http.util.TextUtils
-
-import java.awt.*
+import java.awt.Color
 import java.nio.charset.StandardCharsets
-import java.util.HashMap
+import java.util.*
 
 /**
  * @author created by vinson on 2019/5/22
