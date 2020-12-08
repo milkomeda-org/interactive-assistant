@@ -1,22 +1,16 @@
-package com.lauvinson.open.assistant.utils
+package com.lauvinson.source.open.assistant.utils
 
 
-import org.apache.commons.httpclient.HttpClient
-import org.apache.commons.httpclient.HttpException
-import org.apache.commons.httpclient.HttpStatus
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager
+import org.apache.commons.httpclient.*
 import org.apache.commons.httpclient.methods.GetMethod
 import org.apache.commons.httpclient.methods.PostMethod
 import org.apache.commons.httpclient.methods.StringRequestEntity
-import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.*
 
 object HttpUtils {
-
-    private val log = LoggerFactory.getLogger(HttpUtils::class.java)
 
     //因为请求链接里需要一些特殊字符来拼接参数，这里将它们定义成变量，方便以后修改
     private val URL_PARAM_CONNECT_FLAG = "&"
@@ -26,9 +20,9 @@ object HttpUtils {
     //使用这个对象简单来说就是为了不去考虑多线程带来安全的问题
     private var connectionManager: MultiThreadedHttpConnectionManager? = null
     //将参数提取成变量，方便以后修改
-    private val connectionTimeOut = 25000
+    private val connectionTimeOut = 5000
 
-    private val socketTimeOut = 25000
+    private val socketTimeOut = 5000
 
     private val maxConnectionPerHost = 20
 
@@ -79,12 +73,18 @@ object HttpUtils {
                 result["data"] = response
             } else {
                 result["status"] = postMethod.statusCode
-        }
+            }
+        } catch (e: ConnectTimeoutException) {
+            result["status"] = "连接超时"
+            e.printStackTrace()
         } catch (e: HttpException) {
-            log.error("发生致命的异常，可能是协议不对或者返回的内容有问题", e)
+            result["status"] = "发生致命的异常，可能是协议不对或者返回的内容有问题"
             e.printStackTrace()
         } catch (e: IOException) {
-            log.error("发生网络异常", e)
+            result["status"] = "发生网络异常"
+            e.printStackTrace()
+        } catch (e: Exception) {
+            result["status"] = "未知错误"
             e.printStackTrace()
         } finally {
             postMethod?.releaseConnection()
@@ -111,11 +111,17 @@ object HttpUtils {
             } else {
                 result["status"] = postMethod.statusCode
             }
+        } catch (e: ConnectTimeoutException) {
+            result["status"] = "连接超时"
+            e.printStackTrace()
         } catch (e: HttpException) {
-            log.error("发生致命的异常，可能是协议不对或者返回的内容有问题", e)
+            result["status"] = "发生致命的异常，可能是协议不对或者返回的内容有问题"
             e.printStackTrace()
         } catch (e: IOException) {
-            log.error("发生网络异常", e)
+            result["status"] = "发生网络异常"
+            e.printStackTrace()
+        } catch (e: Exception) {
+            result["status"] = "未知错误"
             e.printStackTrace()
         } finally {
             postMethod?.releaseConnection()
@@ -125,7 +131,7 @@ object HttpUtils {
 
     fun URLGet(url: String, params: Map<String, String>, enc: String): String? {
 
-        var response: String? = EMPTY
+        var response: String?
         var getMethod: GetMethod? = null
         val strtTotalURL = StringBuffer(EMPTY)
 
@@ -138,6 +144,8 @@ object HttpUtils {
         try {
             getMethod = GetMethod(strtTotalURL.toString())
             getMethod.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=$enc")
+            getMethod.setRequestHeader("Host", url)
+            getMethod.setRequestHeader("Refresh", url)
             //执行getMethod
             val statusCode = client!!.executeMethod(getMethod)
             if (statusCode == HttpStatus.SC_OK) {
@@ -145,11 +153,17 @@ object HttpUtils {
             } else {
                 response = null
             }
+        } catch (e: ConnectTimeoutException) {
+            response = "连接超时"
+            e.printStackTrace()
         } catch (e: HttpException) {
-            log.error("发生致命的异常，可能是协议不对或者返回的内容有问题", e)
+            response = "发生致命的异常，可能是协议不对或者返回的内容有问题"
             e.printStackTrace()
         } catch (e: IOException) {
-            log.error("发生网络异常", e)
+            response = "发生网络异常"
+            e.printStackTrace()
+        } catch (e: Exception) {
+            response = "未知错误"
             e.printStackTrace()
         } finally {
             getMethod?.releaseConnection()
