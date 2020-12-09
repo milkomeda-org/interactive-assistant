@@ -7,6 +7,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.xml.ui.ComboTableCellEditor;
 import com.lauvinson.source.open.assistant.Constant;
 import com.lauvinson.source.open.assistant.Group;
 import com.lauvinson.source.open.assistant.configuration.Config;
@@ -22,6 +23,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Type;
@@ -35,7 +38,6 @@ public class Setting implements Configurable {
     private static final Object[][] EMPT_TTWO_DIMENSION_ARRAY = new Object[0][0];
     private final LinkedHashMap<String, LinkedHashMap<String, String>> group = new LinkedHashMap<>();
     private LinkedHashMap<String, String> attribute = new LinkedHashMap<>();
-    private final LinkedHashMap<String, String> EmptyStringMap = new LinkedHashMap<>();
 
     private String selectGroupKey = "";
 
@@ -110,7 +112,7 @@ public class Setting implements Configurable {
             Object select = groupList.getSelectedValue();
             group.remove(select.toString());
             updateAbilityUi(EMPT_TTWO_DIMENSION_ARRAY);
-            setAttributeMapData(EmptyStringMap);
+            setAttributeMapData(null);
             updateGroupUi();
             groupRemoveButton.setEnabled(false);
             attributeRemoveButton.setEnabled(!MapUtils.isEmpty(attribute));
@@ -244,10 +246,13 @@ public class Setting implements Configurable {
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
-        attributeTable = new JBTable(new AbilityTableModel());
+        attributeTable = new AbilityTable(new AbilityTableModel());
     }
 
     private void setAttributeMapData(LinkedHashMap<String, String> mapData) {
+        if (null == mapData) {
+            attributeMap.setText("");
+        }
         attributeMap.setText(new GsonBuilder().setPrettyPrinting().create().toJson(new LinkedHashMap<>(mapData)));
     }
 
@@ -353,4 +358,19 @@ public class Setting implements Configurable {
     }
 
 
+    class AbilityTable extends JBTable {
+
+        public AbilityTable(TableModel model) {
+            super(model);
+        }
+
+        @Override
+        public TableCellEditor getCellEditor(int row, int column) {
+            if (column == 1 && Constant.AbilityType.equals(attributeTable.getValueAt(row, 0).toString())) {
+                String[] values = new String[] { Constant.AbilityType_API, Constant.AbilityType_EXE};
+                return new DefaultCellEditor(new JComboBox<>(values));
+            }
+            return super.getCellEditor(row, column);
+        }
+    }
 }
