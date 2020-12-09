@@ -32,8 +32,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.JBColor
 import com.lauvinson.source.open.assistant.Constant.AbilityType_EXE
 import com.lauvinson.source.open.assistant.Constant.AbilityType_EXE_PATH
-import com.lauvinson.source.open.assistant.configuration.Config
-import com.lauvinson.source.open.assistant.configuration.ConfigService
 import com.lauvinson.source.open.assistant.utils.HttpUtils
 import com.lauvinson.source.open.assistant.utils.JsonUtils
 import org.apache.http.util.TextUtils
@@ -48,29 +46,21 @@ import java.util.*
  */
 open class Group : ActionGroup() {
 
-    private val config: Config? = ConfigService.getInstance().state
-
     companion object {
         val list: ArrayList<ApiAction> = ArrayList()
-        var modify = true
         var virtualFile : VirtualFile? = null
-        fun modify(){
-            modify = true
+        fun modify(group: LinkedHashMap<String, LinkedHashMap<String, String>>?){
+            list.clear()
+            if (group != null) {
+                for (m in group) {
+                    list.add(ApiAction(m.key, m.value))
+                }
+            }
         }
     }
 
     override fun getChildren(e: AnActionEvent?): Array<AnAction> {
         virtualFile = e?.getData(PlatformDataKeys.VIRTUAL_FILE)
-        if (modify) {
-            println("get menus")
-            list.clear()
-            if (config?.group?.isNotEmpty() == true) {
-                for (m in config.group) {
-                    list.add(ApiAction(m.key, m.value))
-                }
-            }
-            modify = false
-        }
         return list.toArray(arrayOf())
     }
 
@@ -85,7 +75,7 @@ open class Group : ActionGroup() {
                     if (TextUtils.isEmpty(selectedText)) {
                         return
                     }
-                    val response = JsonUtils.JsonFormart(mapping["url"]?.let { HttpUtils.URLGet(it, HashMap(), StandardCharsets.UTF_8.displayName()) }!!)
+                    val response = JsonUtils.format(mapping["url"]?.let { HttpUtils.URLGet(it, HashMap(), StandardCharsets.UTF_8.displayName()) }!!)
                     showPopupBalloon(mEditor, response)
                 }
             }else if (AbilityType_EXE == mapping[Constant.AbilityType]) {
@@ -109,10 +99,9 @@ open class Group : ActionGroup() {
                     val openProjects: Array<Project> = projectManager.openProjects
                     // 项目对象
                     // 项目对象
-                    var project = if (openProjects.size > 0) openProjects[0] else projectManager.defaultProject
+                    val project = if (openProjects.isNotEmpty()) openProjects[0] else projectManager.defaultProject
                     val runner = ShTerminalRunner(project)
                     runner.run(sb.toString(), "~", virtualFile?.name.toString())
-                    println()
                 }
             }
         }

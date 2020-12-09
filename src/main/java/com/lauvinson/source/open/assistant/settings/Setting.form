@@ -20,7 +20,7 @@
         </properties>
         <border type="none"/>
         <children>
-          <grid id="e8fc9" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="e8fc9" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <tabbedpane title="Power"/>
@@ -28,18 +28,10 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="8ec57" class="javax.swing.JLabel" binding="groupLabel">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Groups"/>
-                </properties>
-              </component>
               <grid id="35cec" binding="top" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="0" left="0" bottom="0" right="0"/>
                 <constraints>
-                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
                 <border type="none"/>
@@ -106,75 +98,119 @@
               </grid>
               <component id="c4274" class="javax.swing.JLabel" binding="abilityMapLabel">
                 <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <text value="Attributes"/>
                 </properties>
               </component>
-              <grid id="34b76" binding="bottom" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="34b76" binding="bottom" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="0" left="0" bottom="0" right="0"/>
                 <constraints>
-                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <scrollpane id="7398d">
+                  <tabbedpane id="f9c4f" binding="bottomTab">
                     <constraints>
-                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                        <preferred-size width="200" height="200"/>
+                      </grid>
                     </constraints>
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="cd591" class="javax.swing.JTable" binding="attributeTable" custom-create="true">
-                        <constraints/>
+                      <grid id="b4f8" binding="Tab" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="0" left="0" bottom="0" right="0"/>
+                        <constraints>
+                          <tabbedpane title="Form"/>
+                        </constraints>
                         <properties/>
-                      </component>
-                    </children>
-                  </scrollpane>
-                  <grid id="fd200" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-                    <margin top="0" left="0" bottom="0" right="0"/>
-                    <constraints>
-                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties/>
-                    <border type="none">
-                      <title-color color="-4473925"/>
-                    </border>
-                    <children>
-                      <component id="126e1" class="javax.swing.JButton" binding="attributeAddButton">
+                        <border type="none"/>
+                        <children>
+                          <scrollpane id="7398d">
+                            <constraints>
+                              <grid row="0" column="0" row-span="3" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <component id="cd591" class="javax.swing.JTable" binding="attributeTable" custom-create="true">
+                                <constraints/>
+                                <properties/>
+                              </component>
+                            </children>
+                          </scrollpane>
+                          <grid id="fd200" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                            <margin top="0" left="0" bottom="0" right="0"/>
+                            <constraints>
+                              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none">
+                              <title-color color="-4473925"/>
+                            </border>
+                            <children>
+                              <component id="9e7f5" class="javax.swing.JButton" binding="attributeRemoveButton">
+                                <constraints>
+                                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                </constraints>
+                                <properties>
+                                  <enabled value="false"/>
+                                  <icon value="general/remove.png"/>
+                                  <text value=""/>
+                                </properties>
+                              </component>
+                              <component id="126e1" class="javax.swing.JButton" binding="attributeAddButton">
+                                <constraints>
+                                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                </constraints>
+                                <properties>
+                                  <doubleBuffered value="false"/>
+                                  <enabled value="false"/>
+                                  <focusCycleRoot value="false"/>
+                                  <focusTraversalPolicyProvider value="false"/>
+                                  <hideActionText value="false"/>
+                                  <horizontalTextPosition value="0"/>
+                                  <icon value="general/add.png"/>
+                                  <text value=""/>
+                                  <verticalAlignment value="0"/>
+                                </properties>
+                                <clientProperties>
+                                  <hideActionText class="java.lang.Boolean" value="false"/>
+                                  <html.disable class="java.lang.Boolean" value="false"/>
+                                </clientProperties>
+                              </component>
+                            </children>
+                          </grid>
+                        </children>
+                      </grid>
+                      <grid id="81cca" binding="Map" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="0" left="0" bottom="0" right="0"/>
                         <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <tabbedpane title="Map"/>
                         </constraints>
-                        <properties>
-                          <doubleBuffered value="false"/>
-                          <enabled value="false"/>
-                          <focusCycleRoot value="false"/>
-                          <focusTraversalPolicyProvider value="false"/>
-                          <hideActionText value="false"/>
-                          <horizontalTextPosition value="0"/>
-                          <icon value="general/add.png"/>
-                          <text value=""/>
-                          <verticalAlignment value="0"/>
-                        </properties>
-                        <clientProperties>
-                          <hideActionText class="java.lang.Boolean" value="false"/>
-                          <html.disable class="java.lang.Boolean" value="false"/>
-                        </clientProperties>
-                      </component>
-                      <component id="9e7f5" class="javax.swing.JButton" binding="attributeRemoveButton">
-                        <constraints>
-                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                        </constraints>
-                        <properties>
-                          <enabled value="false"/>
-                          <icon value="general/remove.png"/>
-                          <text value=""/>
-                        </properties>
-                      </component>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <scrollpane id="9106f">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <component id="1485b" class="javax.swing.JTextArea" binding="attributeMap">
+                                <constraints/>
+                                <properties/>
+                              </component>
+                            </children>
+                          </scrollpane>
+                        </children>
+                      </grid>
                     </children>
-                  </grid>
+                  </tabbedpane>
                 </children>
               </grid>
             </children>

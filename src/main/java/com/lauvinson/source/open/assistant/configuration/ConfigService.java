@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 @State(name = "private-interactive-assistant", storages = {@Storage(value = "$APP_CONFIG$/private-interactive-assistant.xml")})
 public class ConfigService implements PersistentStateComponent<Config> {
-    private final Config config = new Config();
+    private Config config = new Config();
 
     public static ConfigService getInstance() {
         return ServiceManager.getService(ConfigService.class);
@@ -16,6 +16,13 @@ public class ConfigService implements PersistentStateComponent<Config> {
 
     @Override
     public Config getState() {
+        if (config == null) {
+            synchronized (ConfigService.class) {
+                if (config == null) {
+                    config = new Config();
+                }
+            }
+        }
         return config;
     }
 

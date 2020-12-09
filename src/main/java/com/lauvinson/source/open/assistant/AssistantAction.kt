@@ -28,7 +28,7 @@ class AssistantAction : AnAction() {
         if (TextUtils.isEmpty(selectedText)) {
             return
         }
-        val response = JsonUtils.JsonFormart(HttpUtils.URLGet("http://fanyi.youdao.com/openapi.do?keyfrom=neverland&key=969918857&type=data&doctype=json&version=1.1&q=" + selectedText!!, HashMap(), StandardCharsets.UTF_8.displayName())!!)
+        val response = JsonUtils.format(HttpUtils.URLGet("http://fanyi.youdao.com/openapi.do?keyfrom=neverland&key=969918857&type=data&doctype=json&version=1.1&q=" + selectedText!!, HashMap(), StandardCharsets.UTF_8.displayName())!!)
         println(response)
         showPopupBalloon(mEditor, response)
     }

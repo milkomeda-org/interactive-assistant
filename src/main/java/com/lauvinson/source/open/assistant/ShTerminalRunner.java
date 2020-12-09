@@ -10,9 +10,9 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.terminal.LocalTerminalDirectRunner;
+import org.jetbrains.plugins.terminal.ShellTerminalWidget;
 import org.jetbrains.plugins.terminal.TerminalToolWindowFactory;
 import org.jetbrains.plugins.terminal.TerminalView;
-import org.jetbrains.plugins.terminal.ShellTerminalWidget;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -64,9 +64,9 @@ public class ShTerminalRunner {
     private static Pair<Content, ShellTerminalWidget> getSuitableProcess(@NotNull Content content, @NotNull String commandName) {
         JBTerminalWidget widget = TerminalView.getWidgetByContent(content);
         if (!(widget instanceof ShellTerminalWidget)) return null;
+        if (!content.getDisplayName().equals(commandName)) return null;
         ShellTerminalWidget shellTerminalWidget = (ShellTerminalWidget)widget;
         if (!shellTerminalWidget.getTypedShellCommand().isEmpty() || shellTerminalWidget.hasRunningCommands()) return null;
-        if (!content.getDisplayName().equals(commandName)) return null;
         return Pair.create(content, shellTerminalWidget);
     }
 }

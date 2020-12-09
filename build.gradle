@@ -28,6 +28,7 @@ dependencies {
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.3.21'
     compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
@@ -40,6 +41,12 @@ intellij {
 patchPluginXml {
     changeNotes """
       <h3>v0.0.6</h3>
+      <ul>
+      <li>supported 203</li>
+      <h3>v0.0.5</h3>
+      <ul>
+      <li>supported 202</li>
+      <h3>v0.0.4</h3>
       <ul>
         <li>supported exe and api</li>
       </ul>

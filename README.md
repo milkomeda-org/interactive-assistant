@@ -26,6 +26,12 @@
 
 <h3>v0.0.6</h3>
 <ul>
+<li>supported 203</li>
+<h3>v0.0.5</h3>
+<ul>
+<li>supported 202</li>
+<h3>v0.0.4</h3>
+<ul>
 <li>supported exe and api</li>
 </ul>
 <h3>v0.0.3</h3>
