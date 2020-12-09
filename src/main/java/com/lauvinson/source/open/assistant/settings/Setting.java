@@ -11,18 +11,17 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ToolbarDecorator;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.lauvinson.source.open.assistant.Constant;
 import com.lauvinson.source.open.assistant.Group;
 import com.lauvinson.source.open.assistant.configuration.Config;
 import com.lauvinson.source.open.assistant.configuration.ConfigService;
 import com.lauvinson.source.open.assistant.utils.CollectionUtils;
 import com.lauvinson.source.open.assistant.utils.JsonUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -52,25 +51,11 @@ public class Setting implements Configurable {
 
     private static final String DISPLAY_NAME = "Interactive Assistant";
 
-    private JPanel root;
-    private JButton groupAddButton;
-    private JButton groupRemoveButton;
-    private JScrollPane groupPanel;
-    private JLabel abilityMapLabel;
+    private BorderLayoutPanel root;
     private JBList<Object> groupList;
-    private JPanel power;
-    private JPanel top;
-    private JTable attributeTable;
-    private JTabbedPane tabs;
-    private JPanel bottom;
-    private JButton attributeAddButton;
-    private JButton attributeRemoveButton;
-    private JTabbedPane bottomTab;
-    private JPanel attributesPane;
-    private JPanel Map;
+    private AbilityTable attributeTable;
     private EditorTextField attributeMap;
-    private JScrollPane attributeMapScroll;
-    private JPanel groupToolBarPanel;
+    private JBScrollPane attributeMapScroll;
 
     @Nls
     @Override
@@ -83,55 +68,95 @@ public class Setting implements Configurable {
     public JComponent createComponent() {
         CollectionUtils.Companion.mapCopy(config.getGroup(), this.group);
 
+        this.attributeMap = new EditorTextField();
+        this.attributeMap.setOneLineMode(false);
+        this.attributeMapScroll = new JBScrollPane();
+        this.attributeMapScroll.setBorder(BorderFactory.createLineBorder(JBColor.GREEN, 1, true));
+        this.attributeMapScroll.setViewportView(this.attributeMap);
+
         //build panel
         //root
-        this.root = new JPanel();
-        root.setLayout(new GridLayout(1,1,0,0));
+        this.root = new BorderLayoutPanel();
 
+        JTabbedPane tabs;
         {
             //tabs
-            this.tabs = new JTabbedPane(SwingConstants.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
+            tabs = new JBTabbedPane();
             {
                 //power
-                this.power = new JPanel(new GridLayout(2,1,0,0));
+                JPanel power = new JPanel();
+                power.setLayout(new BoxLayout(power,BoxLayout.X_AXIS));
                 {
                     //top
-                    this.top = new JPanel(new GridLayout());
+                    BorderLayoutPanel top = new BorderLayoutPanel();
+                    top.setMaximumSize(new Dimension(200, 550));
                     {
                         //groupLIst
                         CollectionListModel<Object> groupListModel = new CollectionListModel<>();
                         this.groupList = new JBList<>(groupListModel);
                         ToolbarDecorator groupListDecorator = ToolbarDecorator.createDecorator(this.groupList);
-                        this.top.add(groupListDecorator.createPanel());
+                        groupListDecorator.setAddAction(anActionButton -> {
+                            LinkedHashMap<String, String> value = new LinkedHashMap<>(1) {{
+                                put(Constant.AbilityType, Constant.AbilityType_API);
+                            }};
+                            group.put(UUID.randomUUID().toString(), value);
+                            updateGroupUi();
+                        });
+                        groupListDecorator.setRemoveAction(anActionButton -> {
+                            group.remove(selectGroupKey);
+                            updateAbilityUi(EMPTY_TWO_DIMENSION_ARRAY);
+                            setAttributeMapData(EMPTY_MAP);
+                            updateGroupUi();
+                        });
+                        top.add(groupListDecorator.createPanel());
                     }
                     //bottom
-                    this.bottom = new JPanel(new GridLayout());
+                    BorderLayoutPanel bottom = new BorderLayoutPanel();
                     {
-                        this.bottom.add(new JButton("测试"));
+                        //tab
+                        JTabbedPane attributeTab = new JBTabbedPane();
+                        //attributes
+                        this.attributeTable = new AbilityTable(new AbilityTableModel());
+                        ToolbarDecorator attributeMapDecorator = ToolbarDecorator.createDecorator(this.attributeTable);
+                        attributeMapDecorator.setRemoveActionUpdater(e -> attributeTable.getSelectedRow() > -1 && attributeTable.getRowCount() > attributeTable.getSelectedRow() && !Constant.AbilityType.equals(attributeTable.getValueAt(attributeTable.getSelectedRow(), 0).toString()));
+                        attributeMapDecorator.setAddActionUpdater(e -> !"".equals(selectGroupKey));
+                        attributeMapDecorator.setAddAction(anActionButton -> {
+                            LinkedHashMap<String, String> attributes = group.get(selectGroupKey);
+                            attributes.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+                            Object[][] ability = CollectionUtils.Companion.getMapKeyValue(attributes);
+                            updateAbilityUi(ability);
+                            setAttributeMapData(attributes);
+                        });
+                        attributeMapDecorator.setRemoveAction(anActionButton -> {
+                            int row = attributeTable.getSelectedRow();
+                            attribute.remove(attributeTable.getValueAt(row, 0).toString());
+                            Object[][] ability = CollectionUtils.Companion.getMapKeyValue(attribute);
+                            updateAbilityUi(ability);
+                            setAttributeMapData(attribute);
+                        });
+                        attributeTab.addTab("Table", attributeMapDecorator.createPanel());
+                        attributeTab.addTab("Map", this.attributeMapScroll);
+                        bottom.add(attributeTab);
                     }
-                    this.power.add(top);
-                    this.power.add(new JBLabel("Attributes"));
-                    this.power.add(bottom);
+                    power.add(top);
+                    power.add(Box.createHorizontalStrut(10));
+                    power.add(bottom);
                 }
-                this.tabs.addTab("Power", this.power);
+                tabs.addTab("Power", power);
             }
-            this.root.add(this.tabs);
+            this.root.add(tabs);
         }
 
+        // fill data
+        this.loadSettings();
+        tabs.setSelectedIndex(0);
         return this.root;
-
-//        this.loadSettings();
-//        this.attributeMap.setOneLineMode(false);
-//        this.tabs.setSelectedIndex(0);
-//        return this.root;
     }
 
     @Override
     public boolean isModified() {
         boolean modify = config.getGroup().equals(group);
-        if (!modify) {
-            Group.Companion.modify(group);
-        }
+        Group.Companion.reset(group);
         return !modify;
     }
 
@@ -159,41 +184,21 @@ public class Setting implements Configurable {
     }
 
     private void initListener() {
-        groupAddButton.addActionListener(e -> {
-            LinkedHashMap<String, String> value = new LinkedHashMap<String, String>(1) {{
-                put(Constant.AbilityType, Constant.AbilityType_API);
-            }};
-            group.put(UUID.randomUUID().toString(), value);
-            updateGroupUi();
-        });
-
-        groupRemoveButton.addActionListener(e -> {
-            Object select = groupList.getSelectedValue();
-            group.remove(select.toString());
-            updateAbilityUi(EMPTY_TWO_DIMENSION_ARRAY);
-            setAttributeMapData(EMPTY_MAP);
-            updateGroupUi();
-            groupRemoveButton.setEnabled(false);
-            attributeRemoveButton.setEnabled(!MapUtils.isEmpty(attribute));
-            attributeAddButton.setEnabled(true);
-        });
 
         groupList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(groupList.getSelectedIndex() != -1) {
+                if (groupList.getSelectedIndex() != -1) {
                     Object oldValue = groupList.getSelectedValue();
                     if (1 == e.getClickCount()) {
                         selectGroupKey = oldValue.toString();
-                        groupRemoveButton.setEnabled(true);
                         // show map
                         attribute = group.get(selectGroupKey);
                         Object[][] ability = CollectionUtils.Companion.getMapKeyValue(attribute);
                         updateAbilityUi(ability);
                         setAttributeMapData(attribute);
-                        attributeAddButton.setEnabled(true);
                     }
-                    if(e.getClickCount() == 2) {
+                    if (e.getClickCount() == 2) {
                         String newValue = doubleClick(oldValue);
                         if (StringUtils.isNotBlank(newValue)) {
                             group.put(newValue, group.remove(oldValue.toString()));
@@ -204,32 +209,10 @@ public class Setting implements Configurable {
             }
         });
 
-        attributeAddButton.addActionListener(e -> {
-            LinkedHashMap<String, String> attributes = group.get(selectGroupKey);
-            attributes.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-            Object[][] ability = CollectionUtils.Companion.getMapKeyValue(attributes);
-            updateAbilityUi(ability);
-            setAttributeMapData(attributes);
-        });
-
-        attributeRemoveButton.addActionListener(e -> {
-            int row = attributeTable.getSelectedRow();
-            attribute.remove(attributeTable.getValueAt(row, 0).toString());
-            Object[][] ability = CollectionUtils.Companion.getMapKeyValue(attribute);
-            attributeRemoveButton.setEnabled(!MapUtils.isEmpty(attribute));
-            updateAbilityUi(ability);
-            setAttributeMapData(attribute);
-        });
-
         attributeTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(attributeTable.getSelectedRow() != -1) {
-                    int row = attributeTable.getSelectedRow();
-                    if (Constant.AbilityType.equals(attributeTable.getValueAt(row, 0).toString())) {
-                        return;
-                    }
-                    attributeRemoveButton.setEnabled(true);
+                if (attributeTable.getSelectedRow() != -1) {
                     attributeTable.editCellAt(attributeTable.getSelectedRow(), attributeTable.getSelectedColumn(), e);
                 }
             }
@@ -247,15 +230,15 @@ public class Setting implements Configurable {
                     boolean isJson = JsonUtils.INSTANCE.isJson(text);
                     if (!isJson) {
                         attributeMapScroll.setBorder(BorderFactory.createLineBorder(JBColor.RED, 1, true));
-                    }else {
+                    } else {
                         attributeMapScroll.setBorder(BorderFactory.createLineBorder(JBColor.GREEN, 1, true));
-                        Type type = new TypeToken<LinkedHashMap<String, String>>(){}.getType();
+                        Type type = new TypeToken<LinkedHashMap<String, String>>() {
+                        }.getType();
                         LinkedHashMap<String, String> attributes = group.get(selectGroupKey);
                         LinkedHashMap<String, String> map = new Gson().fromJson(text, type);
                         attributes.clear();
                         attributes.putAll(map);
                         Object[][] ability = CollectionUtils.Companion.getMapKeyValue(map);
-                        attributeRemoveButton.setEnabled(!MapUtils.isEmpty(map));
                         updateAbilityUi(ability);
                     }
                 }
@@ -295,11 +278,6 @@ public class Setting implements Configurable {
         );
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-        attributeTable = new AbilityTable(new AbilityTableModel());
-    }
-
     private void setAttributeMapData(LinkedHashMap<String, String> mapData) {
         attributeMap.setText(new GsonBuilder().setPrettyPrinting().create().toJson(new LinkedHashMap<>(mapData)));
     }
@@ -307,7 +285,7 @@ public class Setting implements Configurable {
 
     class AbilityTableModel extends AbstractTableModel {
         // 表格中第一行所要显示的内容存放在字符串数组columnNames中
-        String[] abilityColumnNames = { "Name", "Pass"};
+        String[] abilityColumnNames = {"Name", "Pass"};
         // 表格中各行的内容保存在二维数组data中
         Object[][] data;
 
@@ -364,6 +342,12 @@ public class Setting implements Configurable {
         // 改变某个数据的值
         @Override
         public void setValueAt(Object value, int row, int col) {
+            if (Constant.AbilityType.equals(value.toString())) {
+                JOptionPane.showMessageDialog(root, "The \""
+                        + value.toString()
+                        + "\" has already.");
+                return;
+            }
             if (data[0][col] instanceof Integer && !(value instanceof Integer)) {
                 try {
                     data[row][col] = Integer.valueOf(value.toString());
@@ -414,11 +398,18 @@ public class Setting implements Configurable {
 
         @Override
         public TableCellEditor getCellEditor(int row, int column) {
-            if (column == 1 && Constant.AbilityType.equals(attributeTable.getValueAt(row, 0).toString())) {
-                String[] values = new String[] { Constant.AbilityType_API, Constant.AbilityType_EXE};
-                return new DefaultCellEditor(new JComboBox<>(values));
+            if (Constant.AbilityType.equals(attributeTable.getValueAt(row, 0).toString())) {
+                if (column == 1) {
+                    String[] values = new String[]{Constant.AbilityType_API, Constant.AbilityType_EXE};
+                    return new DefaultCellEditor(new JComboBox<>(values));
+                }
             }
             return super.getCellEditor(row, column);
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return !(Constant.AbilityType.equals(attributeTable.getValueAt(row, 0).toString()) && column == 0);
         }
     }
 }

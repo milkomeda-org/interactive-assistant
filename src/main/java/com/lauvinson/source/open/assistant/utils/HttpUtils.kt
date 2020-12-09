@@ -13,25 +13,29 @@ import java.util.*
 object HttpUtils {
 
     //因为请求链接里需要一些特殊字符来拼接参数，这里将它们定义成变量，方便以后修改
-    private val URL_PARAM_CONNECT_FLAG = "&"
-    private val EMPTY = ""
+    private const val URL_PARAM_CONNECT_FLAG = "&"
+    private const val EMPTY = ""
 
     //声明一个多线程安全连接管理类变量，关于该类的简单介绍  https://blog.csdn.net/fairytall/article/details/7938692
     //使用这个对象简单来说就是为了不去考虑多线程带来安全的问题
     private var connectionManager: MultiThreadedHttpConnectionManager? = null
     //将参数提取成变量，方便以后修改
-    private val connectionTimeOut = 5000
+    private const val connectionTimeOut = 5000
 
-    private val socketTimeOut = 5000
+    private const val socketTimeOut = 5000
 
-    private val maxConnectionPerHost = 20
+    private const val maxConnectionPerHost = 20
 
-    private val maxTotalConnections = 20
+    private const val maxTotalConnections = 20
     //声明client变量，用于执行请求的
     private var client: HttpClient? = null
 
     init {
-        connectionManager = MultiThreadedHttpConnectionManager()
+        try {
+            connectionManager = MultiThreadedHttpConnectionManager()
+        } catch (e: Exception) {
+            println(e)
+        }
         connectionManager!!.params.connectionTimeout = connectionTimeOut
         connectionManager!!.params.soTimeout = socketTimeOut
         connectionManager!!.params.defaultMaxConnectionsPerHost = maxConnectionPerHost

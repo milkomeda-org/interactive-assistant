@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -32,6 +33,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.JBColor
 import com.lauvinson.source.open.assistant.Constant.AbilityType_EXE
 import com.lauvinson.source.open.assistant.Constant.AbilityType_EXE_PATH
+import com.lauvinson.source.open.assistant.configuration.ConfigService
 import com.lauvinson.source.open.assistant.utils.HttpUtils
 import com.lauvinson.source.open.assistant.utils.JsonUtils
 import org.apache.http.util.TextUtils
@@ -46,10 +48,12 @@ import java.util.*
  */
 open class Group : ActionGroup() {
 
+    private val configService = ServiceManager.getService(ConfigService::class.java)
+
     companion object {
         val list: ArrayList<ApiAction> = ArrayList()
         var virtualFile : VirtualFile? = null
-        fun modify(group: LinkedHashMap<String, LinkedHashMap<String, String>>?){
+        fun reset(group: LinkedHashMap<String, LinkedHashMap<String, String>>?){
             list.clear()
             if (group != null) {
                 for (m in group) {
@@ -60,11 +64,14 @@ open class Group : ActionGroup() {
     }
 
     override fun getChildren(e: AnActionEvent?): Array<AnAction> {
+        if (list.size < 1) {
+            reset(configService.state?.group)
+        }
         virtualFile = e?.getData(PlatformDataKeys.VIRTUAL_FILE)
         return list.toArray(arrayOf())
     }
 
-    class ApiAction(name: String, private val mapping: java.util.LinkedHashMap<String, String>) : AnAction(name) {
+    class ApiAction(name: String, private val mapping: LinkedHashMap<String, String>) : AnAction(name) {
 
         override fun actionPerformed(e: AnActionEvent) {
             if (Constant.AbilityType_API == mapping[Constant.AbilityType]) {
