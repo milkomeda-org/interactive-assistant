@@ -4,10 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.options.Configurable;
+import com.intellij.ui.CollectionListModel;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.ToolbarDecorator;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
-import com.intellij.util.xml.ui.ComboTableCellEditor;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.util.ui.JBUI;
 import com.lauvinson.source.open.assistant.Constant;
 import com.lauvinson.source.open.assistant.Group;
 import com.lauvinson.source.open.assistant.configuration.Config;
@@ -17,14 +25,14 @@ import com.lauvinson.source.open.assistant.utils.JsonUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Type;
@@ -35,7 +43,8 @@ public class Setting implements Configurable {
 
     private final ConfigService configService = ServiceManager.getService(ConfigService.class);
     private final Config config = configService.getState();
-    private static final Object[][] EMPT_TTWO_DIMENSION_ARRAY = new Object[0][0];
+    private static final Object[][] EMPTY_TWO_DIMENSION_ARRAY = new Object[0][0];
+    public static final LinkedHashMap<String, String> EMPTY_MAP = new LinkedHashMap<>();
     private final LinkedHashMap<String, LinkedHashMap<String, String>> group = new LinkedHashMap<>();
     private LinkedHashMap<String, String> attribute = new LinkedHashMap<>();
 
@@ -48,7 +57,8 @@ public class Setting implements Configurable {
     private JButton groupRemoveButton;
     private JScrollPane groupPanel;
     private JLabel abilityMapLabel;
-    private JList<Object> groupList;
+    private JBList<Object> groupList;
+    private JPanel power;
     private JPanel top;
     private JTable attributeTable;
     private JTabbedPane tabs;
@@ -56,10 +66,11 @@ public class Setting implements Configurable {
     private JButton attributeAddButton;
     private JButton attributeRemoveButton;
     private JTabbedPane bottomTab;
-    private JPanel Tab;
+    private JPanel attributesPane;
     private JPanel Map;
-    private JTextArea attributeMap;
-
+    private EditorTextField attributeMap;
+    private JScrollPane attributeMapScroll;
+    private JPanel groupToolBarPanel;
 
     @Nls
     @Override
@@ -71,9 +82,48 @@ public class Setting implements Configurable {
     @Override
     public JComponent createComponent() {
         CollectionUtils.Companion.mapCopy(config.getGroup(), this.group);
-        this.loadSettings();
-        this.tabs.setSelectedIndex(0);
+
+        //build panel
+        //root
+        this.root = new JPanel();
+        root.setLayout(new GridLayout(1,1,0,0));
+
+        {
+            //tabs
+            this.tabs = new JTabbedPane(SwingConstants.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
+            {
+                //power
+                this.power = new JPanel(new GridLayout(2,1,0,0));
+                {
+                    //top
+                    this.top = new JPanel(new GridLayout());
+                    {
+                        //groupLIst
+                        CollectionListModel<Object> groupListModel = new CollectionListModel<>();
+                        this.groupList = new JBList<>(groupListModel);
+                        ToolbarDecorator groupListDecorator = ToolbarDecorator.createDecorator(this.groupList);
+                        this.top.add(groupListDecorator.createPanel());
+                    }
+                    //bottom
+                    this.bottom = new JPanel(new GridLayout());
+                    {
+                        this.bottom.add(new JButton("测试"));
+                    }
+                    this.power.add(top);
+                    this.power.add(new JBLabel("Attributes"));
+                    this.power.add(bottom);
+                }
+                this.tabs.addTab("Power", this.power);
+            }
+            this.root.add(this.tabs);
+        }
+
         return this.root;
+
+//        this.loadSettings();
+//        this.attributeMap.setOneLineMode(false);
+//        this.tabs.setSelectedIndex(0);
+//        return this.root;
     }
 
     @Override
@@ -91,6 +141,15 @@ public class Setting implements Configurable {
         LinkedHashMap<String, LinkedHashMap<String, String>> temp = new LinkedHashMap<>(this.group.size());
         CollectionUtils.Companion.mapCopy(this.group, temp);
         config.setGroup(temp);
+    }
+
+    @Override
+    public void reset() {
+        group.clear();
+        CollectionUtils.Companion.mapCopy(config.getGroup(), group);
+        updateGroupUi();
+        updateAbilityUi(EMPTY_TWO_DIMENSION_ARRAY);
+        setAttributeMapData(EMPTY_MAP);
     }
 
     private void loadSettings() {
@@ -111,8 +170,8 @@ public class Setting implements Configurable {
         groupRemoveButton.addActionListener(e -> {
             Object select = groupList.getSelectedValue();
             group.remove(select.toString());
-            updateAbilityUi(EMPT_TTWO_DIMENSION_ARRAY);
-            setAttributeMapData(null);
+            updateAbilityUi(EMPTY_TWO_DIMENSION_ARRAY);
+            setAttributeMapData(EMPTY_MAP);
             updateGroupUi();
             groupRemoveButton.setEnabled(false);
             attributeRemoveButton.setEnabled(!MapUtils.isEmpty(attribute));
@@ -171,34 +230,25 @@ public class Setting implements Configurable {
                         return;
                     }
                     attributeRemoveButton.setEnabled(true);
+                    attributeTable.editCellAt(attributeTable.getSelectedRow(), attributeTable.getSelectedColumn(), e);
                 }
             }
         });
 
         attributeMap.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                changed(e);
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                changed(e);
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                changed(e);
+            public void documentChanged(@NotNull DocumentEvent event) {
+                changed(event);
             }
 
             private void changed(DocumentEvent e) {
-                if (attributeMap.hasFocus()) {
+                if (attributeMap.isFocusOwner()) {
                     String text = attributeMap.getText();
                     boolean isJson = JsonUtils.INSTANCE.isJson(text);
                     if (!isJson) {
-                        attributeMap.setBorder(BorderFactory.createLineBorder(JBColor.RED));
+                        attributeMapScroll.setBorder(BorderFactory.createLineBorder(JBColor.RED, 1, true));
                     }else {
-                        attributeMap.setBorder(BorderFactory.createLineBorder(JBColor.GREEN));
+                        attributeMapScroll.setBorder(BorderFactory.createLineBorder(JBColor.GREEN, 1, true));
                         Type type = new TypeToken<LinkedHashMap<String, String>>(){}.getType();
                         LinkedHashMap<String, String> attributes = group.get(selectGroupKey);
                         LinkedHashMap<String, String> map = new Gson().fromJson(text, type);
@@ -237,9 +287,10 @@ public class Setting implements Configurable {
     }
 
     private String doubleClick(Object value) {
+//        return new Messages.InputDialog("New name", "Rename", Messages.getQuestionIcon(), value.toString(), new NonEmptyInputValidator()).getInputString();
         return JOptionPane.showInputDialog(
                 root,
-                "Rename",
+                "Modify the group name",
                 value
         );
     }
@@ -250,9 +301,6 @@ public class Setting implements Configurable {
     }
 
     private void setAttributeMapData(LinkedHashMap<String, String> mapData) {
-        if (null == mapData) {
-            attributeMap.setText("");
-        }
         attributeMap.setText(new GsonBuilder().setPrettyPrinting().create().toJson(new LinkedHashMap<>(mapData)));
     }
 
