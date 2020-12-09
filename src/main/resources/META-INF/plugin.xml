@@ -34,10 +34,12 @@
   <change-notes><![CDATA[
       <h3>v0.0.6</h3>
       <ul>
-      <li>supported 203</li>
+        <li>supported 203</li>
+      </ul>
       <h3>v0.0.5</h3>
       <ul>
-      <li>supported 202</li>
+        <li>supported 202</li>
+      </ul>
       <h3>v0.0.4</h3>
       <ul>
         <li>supported exe and api</li>
