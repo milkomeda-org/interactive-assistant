@@ -73,25 +73,20 @@
     <!-- Add your extensions here -->
     <!-- service -->
     <applicationService
-            serviceImplementation="com.lauvinson.source.open.assistant.configuration.ConfigService"/>
+            serviceImplementation="com.lauvinson.source.open.assistant.states.ConfigService"/>
     <!-- settings panel -->
-    <applicationConfigurable instance="com.lauvinson.source.open.assistant.settings.Setting" />
+    <applicationConfigurable instance="com.lauvinson.source.open.assistant.ui.Setting" />
     <!-- tool -->
-    <toolWindow id="Assistant" anchor="right" factoryClass="com.lauvinson.source.open.assistant.SearchToolWindowFactory"
+    <toolWindow id="Assistant" anchor="right" factoryClass="com.lauvinson.source.open.assistant.ui.ToolWindowFactory"
                 icon="/icons/pluginIcon.svg"/>
   </extensions>
 
   <actions>
     <!-- Add your actions here -->
-    <group id="ability" text="Interactive Assistant" popup="true">
-<!--          <action id="Assistant.Main" class="com.lauvinson.source.open.assistant.AssistantAction"-->
-<!--                  text="Interactive Assistant" description="Private interactive assistant">-->
-<!--              <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
-<!--              <keyboard-shortcut keymap="$default" first-keystroke="alt G"/>-->
-<!--          </action>-->
-
-      </group>
-      <group id="StudyAction.MyGroup" class="com.lauvinson.source.open.assistant.Group" text="Abilities" icon="/icons/pluginIcon.svg" popup="true">
+    <group id="EditMenu.Abilities" class="com.lauvinson.source.open.assistant.actions.EditorMenu" text="Abilities" icon="/icons/pluginIcon.svg" popup="true">
+      <add-to-group group-id="EditMenu" anchor="first"/>
+    </group>
+      <group id="Editor.Abilities" class="com.lauvinson.source.open.assistant.actions.EditorMenu" text="Abilities" icon="/icons/pluginIcon.svg" popup="true">
           <add-to-group group-id="EditorPopupMenu" anchor="first"/>
       </group>
   </actions>

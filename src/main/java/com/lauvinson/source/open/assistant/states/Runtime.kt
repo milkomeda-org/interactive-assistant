@@ -16,34 +16,27 @@
  * Equivalent description see [http://rem.mit-license.org/]
  */
 
-package com.lauvinson.source.open.assistant;
+package com.lauvinson.source.open.assistant.states
 
-import javax.swing.*;
+import com.intellij.openapi.components.ServiceManager
+import com.lauvinson.source.open.assistant.actions.Executor
+import java.util.*
 
-/**
- * SearchToolWindowPanel
- *
- * @author created by vinson on 2019/7/2
- */
-@SuppressWarnings("unused")
-class SearchToolWindowPanel {
+open class Runtime {
 
-    private JPanel panel;
-    private JList html;
+    companion object {
+        private val configService = ServiceManager.getService(ConfigService::class.java)
+        private val list: ArrayList<Executor> = ArrayList()
 
+        fun flushGroups(){
+            list.clear()
+            configService.state?.group?.forEach { m ->
+                list.add(Executor(m.key, m.value))
+            }
+        }
 
-    SearchToolWindowPanel() {
-    }
-
-    JPanel createToolWindowPanel() {
-        return panel;
-    }
-
-    private void resetStats() {
-
-    }
-
-    private void createUIComponents() {
-
+        fun getGroups(): ArrayList<Executor> {
+            return list
+        }
     }
 }
