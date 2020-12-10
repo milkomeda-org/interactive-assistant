@@ -7,21 +7,18 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.ui.CollectionListModel;
-import com.intellij.ui.EditorTextField;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.ToolbarDecorator;
+import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
-import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.lauvinson.source.open.assistant.Constant;
 import com.lauvinson.source.open.assistant.Group;
 import com.lauvinson.source.open.assistant.configuration.Config;
 import com.lauvinson.source.open.assistant.configuration.ConfigService;
 import com.lauvinson.source.open.assistant.utils.CollectionUtils;
 import com.lauvinson.source.open.assistant.utils.JsonUtils;
+import io.grpc.internal.JsonParser;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +31,7 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.UUID;
@@ -51,11 +49,11 @@ public class Setting implements Configurable {
 
     private static final String DISPLAY_NAME = "Interactive Assistant";
 
-    private BorderLayoutPanel root;
-    private JBList<Object> groupList;
+    private JPanel root;
+    private JList<Object> groupList;
     private AbilityTable attributeTable;
     private EditorTextField attributeMap;
-    private JBScrollPane attributeMapScroll;
+    private JScrollPane attributeMapScroll;
 
     @Nls
     @Override
@@ -68,15 +66,9 @@ public class Setting implements Configurable {
     public JComponent createComponent() {
         CollectionUtils.Companion.mapCopy(config.getGroup(), this.group);
 
-        this.attributeMap = new EditorTextField();
-        this.attributeMap.setOneLineMode(false);
-        this.attributeMapScroll = new JBScrollPane();
-        this.attributeMapScroll.setBorder(BorderFactory.createLineBorder(JBColor.GREEN, 1, true));
-        this.attributeMapScroll.setViewportView(this.attributeMap);
-
         //build panel
         //root
-        this.root = new BorderLayoutPanel();
+        this.root = new JPanel(new BorderLayout());
 
         JTabbedPane tabs;
         {
@@ -84,12 +76,10 @@ public class Setting implements Configurable {
             tabs = new JBTabbedPane();
             {
                 //power
-                JPanel power = new JPanel();
-                power.setLayout(new BoxLayout(power,BoxLayout.X_AXIS));
+                JPanel power = new JPanel(new GridLayout(1,2,10,10));
                 {
                     //top
-                    BorderLayoutPanel top = new BorderLayoutPanel();
-                    top.setMaximumSize(new Dimension(200, 550));
+                    JPanel top = new JPanel(new BorderLayout());
                     {
                         //groupLIst
                         CollectionListModel<Object> groupListModel = new CollectionListModel<>();
@@ -111,12 +101,15 @@ public class Setting implements Configurable {
                         top.add(groupListDecorator.createPanel());
                     }
                     //bottom
-                    BorderLayoutPanel bottom = new BorderLayoutPanel();
+                    JPanel bottom = new JPanel(new BorderLayout());
                     {
                         //tab
                         JTabbedPane attributeTab = new JBTabbedPane();
+                        attributeTab.setAutoscrolls(true);
                         //attributes
                         this.attributeTable = new AbilityTable(new AbilityTableModel());
+                        this.attributeTable.setRowSelectionAllowed(false);
+                        this.attributeTable.setCellSelectionEnabled(true);
                         ToolbarDecorator attributeMapDecorator = ToolbarDecorator.createDecorator(this.attributeTable);
                         attributeMapDecorator.setRemoveActionUpdater(e -> attributeTable.getSelectedRow() > -1 && attributeTable.getRowCount() > attributeTable.getSelectedRow() && !Constant.AbilityType.equals(attributeTable.getValueAt(attributeTable.getSelectedRow(), 0).toString()));
                         attributeMapDecorator.setAddActionUpdater(e -> !"".equals(selectGroupKey));
@@ -135,11 +128,14 @@ public class Setting implements Configurable {
                             setAttributeMapData(attribute);
                         });
                         attributeTab.addTab("Table", attributeMapDecorator.createPanel());
+                        this.attributeMap = new EditorTextField();
+                        this.attributeMap.setOneLineMode(false);
+                        this.attributeMapScroll = new JBScrollPane(this.attributeMap);
+                        this.attributeMapScroll.setPreferredSize(power.getPreferredSize());
                         attributeTab.addTab("Map", this.attributeMapScroll);
                         bottom.add(attributeTab);
                     }
                     power.add(top);
-                    power.add(Box.createHorizontalStrut(10));
                     power.add(bottom);
                 }
                 tabs.addTab("Power", power);
@@ -221,21 +217,23 @@ public class Setting implements Configurable {
         attributeMap.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(@NotNull DocumentEvent event) {
-                changed(event);
-            }
-
-            private void changed(DocumentEvent e) {
                 if (attributeMap.isFocusOwner()) {
                     String text = attributeMap.getText();
                     boolean isJson = JsonUtils.INSTANCE.isJson(text);
                     if (!isJson) {
-                        attributeMapScroll.setBorder(BorderFactory.createLineBorder(JBColor.RED, 1, true));
+                        attributeMap.setBorder(BorderFactory.createLineBorder(JBColor.RED, 1, true));
                     } else {
-                        attributeMapScroll.setBorder(BorderFactory.createLineBorder(JBColor.GREEN, 1, true));
+                        attributeMap.setBorder(BorderFactory.createLineBorder(JBColor.GREEN, 1, true));
                         Type type = new TypeToken<LinkedHashMap<String, String>>() {
                         }.getType();
                         LinkedHashMap<String, String> attributes = group.get(selectGroupKey);
-                        LinkedHashMap<String, String> map = new Gson().fromJson(text, type);
+                        LinkedHashMap<String, String> map;
+                        try {
+                            map = new Gson().fromJson(JsonParser.parse(text).toString(), type);
+                        } catch (IOException ex) {
+                            attributeMap.setBorder(BorderFactory.createLineBorder(JBColor.RED, 1, true));
+                            return;
+                        }
                         attributes.clear();
                         attributes.putAll(map);
                         Object[][] ability = CollectionUtils.Companion.getMapKeyValue(map);
