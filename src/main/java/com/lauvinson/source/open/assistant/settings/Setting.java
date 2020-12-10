@@ -3,11 +3,15 @@ package com.lauvinson.source.open.assistant.settings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.intellij.json.JsonLanguage;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.ui.*;
+import com.intellij.ui.CollectionListModel;
+import com.intellij.ui.EditorTextField;
+import com.intellij.ui.LanguageTextField;
+import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
@@ -53,7 +57,6 @@ public class Setting implements Configurable {
     private JList<Object> groupList;
     private AbilityTable attributeTable;
     private EditorTextField attributeMap;
-    private JScrollPane attributeMapScroll;
 
     @Nls
     @Override
@@ -128,11 +131,11 @@ public class Setting implements Configurable {
                             setAttributeMapData(attribute);
                         });
                         attributeTab.addTab("Table", attributeMapDecorator.createPanel());
-                        this.attributeMap = new EditorTextField();
+                        this.attributeMap = new LanguageTextField(JsonLanguage.INSTANCE, null, "");
                         this.attributeMap.setOneLineMode(false);
-                        this.attributeMapScroll = new JBScrollPane(this.attributeMap);
-                        this.attributeMapScroll.setPreferredSize(power.getPreferredSize());
-                        attributeTab.addTab("Map", this.attributeMapScroll);
+                        JScrollPane attributeMapScroll = new JBScrollPane(this.attributeMap);
+                        attributeMapScroll.setPreferredSize(power.getPreferredSize());
+                        attributeTab.addTab("Map", attributeMapScroll);
                         bottom.add(attributeTab);
                     }
                     power.add(top);
@@ -220,10 +223,7 @@ public class Setting implements Configurable {
                 if (attributeMap.isFocusOwner()) {
                     String text = attributeMap.getText();
                     boolean isJson = JsonUtils.INSTANCE.isJson(text);
-                    if (!isJson) {
-                        attributeMap.setBorder(BorderFactory.createLineBorder(JBColor.RED, 1, true));
-                    } else {
-                        attributeMap.setBorder(BorderFactory.createLineBorder(JBColor.GREEN, 1, true));
+                    if (isJson) {
                         Type type = new TypeToken<LinkedHashMap<String, String>>() {
                         }.getType();
                         LinkedHashMap<String, String> attributes = group.get(selectGroupKey);
@@ -231,7 +231,6 @@ public class Setting implements Configurable {
                         try {
                             map = new Gson().fromJson(JsonParser.parse(text).toString(), type);
                         } catch (IOException ex) {
-                            attributeMap.setBorder(BorderFactory.createLineBorder(JBColor.RED, 1, true));
                             return;
                         }
                         attributes.clear();
