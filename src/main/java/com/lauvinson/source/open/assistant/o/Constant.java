@@ -18,11 +18,23 @@
 
 package com.lauvinson.source.open.assistant.o;
 
+import java.util.LinkedHashMap;
+
 public class Constant {
-    public static final String AbilityType = "ability_type";
+    public static final String AbilityType = "$type";
     public static final String AbilityType_API = "api";
     public static final String AbilityType_EXE = "exe";
-    public static final String AbilityType_EXE_PATH = "exe_path";
-    public static final String AbilityType_FILE_ARGS_NAME = "file_args_name";
-    public static final String AbilityType_URL_ARGS_NAME = "url_args_name";
+    public static final String Ability_URL = "$url";
+    public static final String Ability_EXE_PATH = "$path";
+    public static final String Ability_FILE_ARGS_NAME = "$args_name";
+    public static final String Ability_URL_ARGS_NAME = "$args_name";
+
+    public static final LinkedHashMap<String, LinkedHashMap<String, String>> AbilityExample = new LinkedHashMap<>(1) {{
+        LinkedHashMap<String, String> yd = new LinkedHashMap<>(1) {{
+            put(AbilityType, AbilityType_API);
+            put(Ability_URL, "http://fanyi.youdao.com/translate?&doctype=json&type=AUTO");
+            put(Ability_URL_ARGS_NAME, "i");
+        }};
+        put("有道翻译", yd);
+    }};
 }

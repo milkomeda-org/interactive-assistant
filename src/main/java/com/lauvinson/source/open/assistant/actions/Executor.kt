@@ -35,15 +35,14 @@ import com.lauvinson.source.open.assistant.utils.ShTerminalRunner
 import org.apache.commons.lang.StringUtils
 import org.apache.http.util.TextUtils
 import java.awt.Color
-import java.util.HashMap
-import java.util.LinkedHashMap
+import java.util.*
 
 open class Executor(name: String, private val mapping: LinkedHashMap<String, String>) : AnAction(name) {
 
     override fun actionPerformed(e: AnActionEvent) {
         if (Constant.AbilityType_API == mapping[Constant.AbilityType]) {
-            mapping["url"]?.let {
-                if (StringUtils.isBlank(mapping[Constant.AbilityType_URL_ARGS_NAME])) {
+            mapping[Constant.Ability_URL]?.let {
+                if (StringUtils.isBlank(mapping[Constant.Ability_URL_ARGS_NAME])) {
                     return
                 }
                 val mEditor = e.getData(PlatformDataKeys.EDITOR) ?: return
@@ -53,20 +52,20 @@ open class Executor(name: String, private val mapping: LinkedHashMap<String, Str
                     return
                 }
                 val params = HashMap<String, String>()
-                params[mapping[Constant.AbilityType_URL_ARGS_NAME].toString()] = selectedText.toString();
-                val response = JsonUtils.format(mapping["url"]?.let { HttpClientUtils.get(it, params) }!!)
+                params[mapping[Constant.Ability_URL_ARGS_NAME].toString()] = selectedText.toString();
+                val response = JsonUtils.format(mapping[Constant.Ability_URL]?.let { HttpClientUtils.get(it, params) }!!)
                 showPopupBalloon(mEditor, response)
             }
         }else if (Constant.AbilityType_EXE == mapping[Constant.AbilityType]) {
-            mapping[Constant.AbilityType_EXE_PATH]?.let {
-                val sb = StringBuilder(mapping[Constant.AbilityType_EXE_PATH])
+            mapping[Constant.Ability_EXE_PATH]?.let {
+                val sb = StringBuilder(mapping[Constant.Ability_EXE_PATH])
                 for (entry in mapping.entries) {
-                    if (Constant.AbilityType == entry.key || Constant.AbilityType_EXE_PATH == entry.key) {
+                    if (Constant.AbilityType == entry.key || Constant.Ability_EXE_PATH == entry.key) {
                         continue
                     }
-                    if (Constant.AbilityType_FILE_ARGS_NAME == entry.key) {
+                    if (Constant.Ability_FILE_ARGS_NAME == entry.key) {
                         sb.append(" -${entry.value}=${EditorMenu.virtualFile?.path.toString()}")
-                    }else {
+                    } else {
                         sb.append(" -${entry.key}=${entry.value}")
                     }
                 }
@@ -84,7 +83,7 @@ open class Executor(name: String, private val mapping: LinkedHashMap<String, Str
     private fun showPopupBalloon(editor: Editor, result: String) {
         ApplicationManager.getApplication().invokeLater {
             val factory = JBPopupFactory.getInstance()
-            factory.createHtmlTextBalloonBuilder(result, null, JBColor(Color(186, 238, 186), Color(73, 117, 73)), null)
+            factory.createHtmlTextBalloonBuilder(result, null, JBColor(Color(186, 238, 186), Color(59, 63, 65)), null)
                 .setFadeoutTime(60000)
                 .createBalloon()
                 .show(factory.guessBestPopupLocation(editor), Balloon.Position.below)

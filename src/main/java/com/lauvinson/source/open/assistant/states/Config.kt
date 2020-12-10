@@ -18,8 +18,9 @@
 
 package com.lauvinson.source.open.assistant.states
 
-import java.util.LinkedHashMap
+import com.lauvinson.source.open.assistant.o.Constant
+import java.util.*
 
-class Config(var group: LinkedHashMap<String, LinkedHashMap<String, String>> = LinkedHashMap()) {
-
+class Config {
+    var group: LinkedHashMap<String, LinkedHashMap<String, String>> = Constant.AbilityExample
 }
