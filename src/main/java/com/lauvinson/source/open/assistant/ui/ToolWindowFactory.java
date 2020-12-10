@@ -49,24 +49,15 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
      *
      * @author created by vinson on 2019/7/2
      */
-    @SuppressWarnings("unused")
     static
     public class ToolWindowPanel {
-
-        private JPanel panel;
-        private JList html;
 
 
         ToolWindowPanel() {
         }
 
         JPanel createToolWindowPanel() {
-            JPanel star = new draw_star();
-            return star;
-        }
-
-        private void resetStats() {
-
+            return new draw_star();
         }
 
         private void createUIComponents() {
@@ -105,14 +96,36 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
     }
 
     static class draw_star extends JPanel {
-
-        thread_star[] s = {new thread_star(1200, 440, 30, (Math.PI / 20)), new thread_star(1600, 440, 40, (Math.PI / 40))
-                , new thread_star(1300, 440, 25, (Math.PI / 30)), new thread_star(1520, 440, 30, (Math.PI / 36)),
-                new thread_star(1080, 440, 18, (Math.PI / 10))
+        Color[] c = {
+                JBColor.RED,
+                JBColor.BLUE,
+                JBColor.WHITE,
+                JBColor.BLACK,
+                JBColor.GRAY,
+                JBColor.LIGHT_GRAY,
+                JBColor.DARK_GRAY,
+                JBColor.PINK,
+                JBColor.ORANGE,
+                JBColor.YELLOW,
+                JBColor.GREEN,
+                JBColor.MAGENTA,
+                JBColor.CYAN,
         };
+        int max_x =1600;
+        int min_x = 1000;
+        int max_y =450;
+        int min_y = 350;
+        private int rand(int min, int max) {
+            return (int) (Math.random() * (max - min) + min);
+        }
+
+        thread_star[] s = new thread_star[c.length];
 
         draw_star() {
-            for (ToolWindowFactory.thread_star thread_star : s) thread_star.start();
+            for (int i = 0; i < s.length; i++) {
+                s[i] = new thread_star(rand(min_x, max_x), rand(min_y, max_y), rand(25, 40), (Math.PI / rand(25, 40)));
+                s[i].start();
+            }
         }
 
         public void paint(Graphics g) {
@@ -120,34 +133,19 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
             Image offScreenImage = this.createImage(this.getWidth(), this.getHeight());
             Graphics gImage = offScreenImage.getGraphics();
             super.paint(gImage);
+            ((Graphics2D)g).setBackground(JBColor.BLACK);
             g.drawImage(offScreenImage, 0, 0, null);
         }
 
         public void paintComponent(Graphics g0) {
-            Graphics2D g;
-            Color[] c = {
-                    JBColor.RED,
-                    JBColor.BLUE,
-                    JBColor.WHITE,
-                    JBColor.BLACK,
-                    JBColor.GRAY,
-                    JBColor.LIGHT_GRAY,
-                    JBColor.DARK_GRAY,
-                    JBColor.PINK,
-                    JBColor.ORANGE,
-                    JBColor.YELLOW,
-                    JBColor.GREEN,
-                    JBColor.MAGENTA,
-                    JBColor.CYAN,
-            };
-            for (int i = 0; i < s.length; i++) {
-                g = (Graphics2D) (g0);
+            Graphics2D g = (Graphics2D) (g0);
+            for (int i = 0; i < c.length -1; i++) {
+                thread_star t = s[i];
                 g.setColor(c[i]);
-                Ellipse2D ellipse2D = new Ellipse2D.Double(s[i].x0 - s[i].r0, s[i].y0 - s[i].r0, 2 * s[i].r0, 2 * s[i].r0);
+                Ellipse2D ellipse2D = new Ellipse2D.Double(t.x0 - t.r0, t.y0 - t.r0, 2 * t.r0, 2 * t.r0);
                 g.fill(ellipse2D);
             }
             repaint();
         }
     }
-
 }
