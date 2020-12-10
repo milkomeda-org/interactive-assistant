@@ -19,12 +19,23 @@
 <ul>
 <li>扩展私有交互</li>
 <li>@author:vinson(<a href="mailto:wincentlauvinson@gmail.com">wincentlauvinson@gmail.com</a>)</li>
-<li>@organize:(<a href="www.milkomeda.org">milkomeda.org</a>)</li>
+<li>@organize:(<a href="https://www.milkomeda.org">milkomeda.org</a>)</li>
 <li>more opprtunities in the future</li>
 </ul>
 <hr />
 
+<h3>v0.0.7</h3>
+<ul>
+<li>remake ui</li>
+</ul>
+<h3>v0.0.6</h3>
+<ul>
+<li>supported 203</li>
 <h3>v0.0.5</h3>
+</ul>
+<ul>
+<li>supported 202</li>
+<h3>v0.0.4</h3>
 <ul>
 <li>supported exe and api</li>
 </ul>
