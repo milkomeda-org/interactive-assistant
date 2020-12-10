@@ -11,7 +11,7 @@ plugins {
 }
 
 group 'com.lauvinson.source.open'
-version '0.0.6'
+version '0.0.7'
 
 sourceCompatibility = 11
 
@@ -40,6 +40,10 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
+      <h3>v0.0.7</h3>
+      <ul>
+        <li>remake ui</li>
+      </ul>
       <h3>v0.0.6</h3>
       <ul>
         <li>supported 203</li>

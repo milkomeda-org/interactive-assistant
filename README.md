@@ -24,6 +24,10 @@
 </ul>
 <hr />
 
+<h3>v0.0.7</h3>
+<ul>
+<li>remake ui</li>
+</ul>
 <h3>v0.0.6</h3>
 <ul>
 <li>supported 203</li>
