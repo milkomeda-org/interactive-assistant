@@ -87,6 +87,7 @@ class Setting : Configurable {
                         val groupListModel = CollectionListModel<Any>()
                         groupList = JBList<Any>(groupListModel)
                         val groupListDecorator = ToolbarDecorator.createDecorator(groupList as JBList<Any>)
+                        groupListDecorator.disableUpDownActions()
                         groupListDecorator.setAddAction {
                             val value: LinkedHashMap<String, String> = object : LinkedHashMap<String, String>(1) {
                                 init {
@@ -117,6 +118,7 @@ class Setting : Configurable {
                         val attributeMapDecorator = ToolbarDecorator.createDecorator(
                             attributeTable!!
                         )
+                        attributeMapDecorator.disableUpDownActions()
                         attributeMapDecorator.setRemoveActionUpdater {
                             attributeTable!!.selectedRow > -1 && attributeTable!!.rowCount > attributeTable!!.selectedRow && Constant.AbilityType != attributeTable!!.getValueAt(
                                 attributeTable!!.selectedRow, 0
