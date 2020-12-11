@@ -233,8 +233,9 @@ class Setting : Configurable {
                         val type = object : TypeToken<LinkedHashMap<String?, String?>?>() {}.type
                         val attributes = group[selectGroupKey]
                         val map: LinkedHashMap<String, String> = try {
-                            Gson().fromJson(JsonParser.parse(text).toString(), type)
+                            Gson().fromJson(text, type)
                         } catch (ex: IOException) {
+                            ex.printStackTrace()
                             return
                         }
                         attributes!!.clear()
