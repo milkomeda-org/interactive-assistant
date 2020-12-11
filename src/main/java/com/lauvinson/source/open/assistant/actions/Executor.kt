@@ -18,16 +18,13 @@
 
 package com.lauvinson.source.open.assistant.actions
 
-import com.intellij.json.JsonLanguage
-import com.intellij.lang.html.HTMLLanguage
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.fileTypes.PlainTextLanguage
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.LanguageTextField
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.lauvinson.source.open.assistant.o.Constant
@@ -41,6 +38,7 @@ import java.awt.Toolkit
 import java.util.*
 import javax.swing.Icon
 import javax.swing.JComponent
+import javax.swing.JTextPane
 
 
 open class Executor(private var name: String, private var mapping: LinkedHashMap<String, String>, icon: Icon) :
@@ -48,9 +46,6 @@ open class Executor(private var name: String, private var mapping: LinkedHashMap
 
 
     override fun actionPerformed(e: AnActionEvent) {
-        val projectManager = ProjectManager.getInstance()
-        val openProjects: Array<Project> = projectManager.openProjects
-        val project = if (openProjects.isNotEmpty()) openProjects[0] else projectManager.defaultProject
         if (Constant.AbilityType_API == mapping[Constant.AbilityType]) {
             mapping[Constant.Ability_URL]?.let {
                 if (StringUtils.isBlank(mapping[Constant.Ability_URL_ARGS_NAME])) {
@@ -63,66 +58,47 @@ open class Executor(private var name: String, private var mapping: LinkedHashMap
                     return
                 }
                 val params = HashMap<String, String>()
-                for (entry in mapping.entries) {
-                    if (Constant.Ability_URL_ARGS_NAME == entry.key) {
-                        params[mapping[Constant.Ability_URL_ARGS_NAME].toString()] = selectedText.toString()
-                    } else {
-                        if (entry.key.startsWith(Constant.SYS_PREFIX)) {
-                            continue
-                        }
-                        params[entry.key] = entry.value
-                    }
-                }
-                val response = HttpClientUtils.get(HttpClientUtils.buildURI(it, params).toString())
-                showPopupBalloon(this.name, response)
+                params[mapping[Constant.Ability_URL_ARGS_NAME].toString()] = selectedText.toString()
+                val response = JsonUtils.format(mapping[Constant.Ability_URL]?.let { HttpClientUtils.get(it, params) }!!)
+                showPopupBalloon(this.name, mEditor, response)
             }
         }else if (Constant.AbilityType_EXE == mapping[Constant.AbilityType]) {
             mapping[Constant.Ability_EXE_PATH]?.let {
-                val sb = StringBuilder(it)
+                val sb = StringBuilder(mapping[Constant.Ability_EXE_PATH])
                 for (entry in mapping.entries) {
+                    if (Constant.AbilityType == entry.key || Constant.Ability_EXE_PATH == entry.key) {
+                        continue
+                    }
                     if (Constant.Ability_FILE_ARGS_NAME == entry.key) {
                         sb.append(" -${entry.value}=${EditorMenu.virtualFile?.path.toString()}")
                     } else {
-                        if (entry.key.startsWith(Constant.SYS_PREFIX)) {
-                            continue
-                        }
                         sb.append(" -${entry.key}=${entry.value}")
                     }
                 }
+                val projectManager = ProjectManager.getInstance()
+                val openProjects: Array<Project> = projectManager.openProjects
+                val project = if (openProjects.isNotEmpty()) openProjects[0] else projectManager.defaultProject
                 val runner = ShTerminalRunner(project)
                 runner.run(sb.toString(), "~", EditorMenu.virtualFile?.name.toString())
             }
         }
     }
 
-    private fun showPopupBalloon(name: String, response: List<String>) {
-        SampleDialogWrapper(name, response).showAndGet()
+    private fun showPopupBalloon(name: String, editor: Editor, result: String) {
+        SampleDialogWrapper(name, result).showAndGet()
     }
 
-    private inner class SampleDialogWrapper(private val _title: String, private val response: List<String>) : DialogWrapper(true) {
+    private inner class SampleDialogWrapper(private val _title: String, private val text: String) : DialogWrapper(true) {
         override fun createCenterPanel(): JComponent {
             val screen = Toolkit.getDefaultToolkit().screenSize
             val size = Dimension(screen.width/3,screen.height/3)
             val panel = BorderLayoutPanel()
-            var text = response[0].trim()
-            val lang =
-                when {
-                    response[1].startsWith("application/json") -> {
-                        text = text.let { JsonUtils.format(it) }
-                        JsonLanguage.INSTANCE
-                    }
-                    response[1].startsWith("text/html") -> {
-                        HTMLLanguage.INSTANCE
-                    }
-                    else -> {
-                        PlainTextLanguage.INSTANCE
-                    }
-                }
-            val textPanel = LanguageTextField(lang, null, text)
-            textPanel.setOneLineMode(false)
+            val label = JTextPane()
+            label.contentType = "text/html"
+            label.text = this.text
             val scroll = JBScrollPane()
             scroll.preferredSize = size
-            scroll.setViewportView(textPanel)
+            scroll.setViewportView(label)
             panel.add(scroll)
             return scroll
         }
