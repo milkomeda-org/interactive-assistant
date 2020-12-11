@@ -1,5 +1,4 @@
 # Interactive-assistant
-<h3>interactive assistant for IntelliJ.</h3>
 <p>It's up to you to use some of the interchangeable interfaces to provide more efficient and timely response, and we'll add more extensible features in the future.</p>
 <p>Support or Suggestions can be found at <a href="https://open.source.lauvinson.com">open.source.lauvinson.com</a></p>
 <br />
@@ -9,10 +8,11 @@
 <hr />
 <p>自助集成一些具有转化交互能力的接口来提供更高效的及时响应。</p>
 <p>如何使用它完全在于你，例如动态的添加助手并方便地获得协助，在未来我们会加入更多可扩展的功能。</p>
+
 <br />
 <p>提示:</p>
-<p>如果ability_type是exe，则exe_path和file_args_name是必选的</p>
-<p>如果ability_type是api则url是必须的</p>
+<p>如果$type是exe，则$path是exe路径，如果$type是api则url是目标地址，但无论怎样,$rgs_name都建议填写，作为参数将你选择的内容传递给executor</p>
+<p>在windows系统下运行，所有路径请使用双引号包括</p>
 
 <br />
 <p>支持或提议请到<a href="https://open.source.lauvinson.com">open.source.lauvinson.com</a></p>
