@@ -25,10 +25,13 @@ import com.intellij.json.JsonLanguage
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.*
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.table.JBTable
 import com.lauvinson.source.open.assistant.o.Constant
 import com.lauvinson.source.open.assistant.states.ConfigService
@@ -36,11 +39,11 @@ import com.lauvinson.source.open.assistant.states.Runtime
 import com.lauvinson.source.open.assistant.utils.CollectionUtils.Companion.getMapKeyValue
 import com.lauvinson.source.open.assistant.utils.CollectionUtils.Companion.mapCopy
 import com.lauvinson.source.open.assistant.utils.JsonUtils.isJson
-import io.grpc.internal.JsonParser
+import com.lauvinson.source.open.assistant.utils.UiUtils
 import org.apache.commons.lang3.StringUtils
+import org.jdesktop.swingx.autocomplete.ComboBoxCellEditor
 import org.jetbrains.annotations.Nls
-import java.awt.BorderLayout
-import java.awt.GridLayout
+import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.IOException
@@ -49,6 +52,7 @@ import javax.swing.*
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.TableCellEditor
 import javax.swing.table.TableModel
+
 
 class Setting : Configurable {
     private val configService = ConfigService.getInstance()
@@ -59,6 +63,7 @@ class Setting : Configurable {
     private var root: JPanel? = null
     private var groupList: JList<Any>? = null
     private var attributeTable: AbilityTable? = null
+    private var attributeTableModel: AbilityTableModel? = null
     private var attributeMap: EditorTextField? = null
     @Nls
     override fun getDisplayName(): String {
@@ -78,7 +83,8 @@ class Setting : Configurable {
             tabs = JBTabbedPane()
             tabs.run{
                 //power
-                val power = JPanel(GridLayout(1, 2, 10, 10))
+                val gbl = GridBagLayout()
+                val power = JPanel(gbl)
                 power.run{
                     //top
                     val top = JPanel(BorderLayout())
@@ -112,7 +118,8 @@ class Setting : Configurable {
                         val attributeTab: JTabbedPane = JBTabbedPane()
                         attributeTab.autoscrolls = true
                         //attributes
-                        attributeTable = AbilityTable(AbilityTableModel())
+                        attributeTableModel = AbilityTableModel()
+                        attributeTable = AbilityTable(attributeTableModel)
                         attributeTable!!.rowSelectionAllowed = false
                         attributeTable!!.cellSelectionEnabled = true
                         val attributeMapDecorator = ToolbarDecorator.createDecorator(
@@ -130,14 +137,12 @@ class Setting : Configurable {
                             attributes!![UUID.randomUUID().toString()] = UUID.randomUUID().toString()
                             val ability: Array<Array<Any?>>? = getMapKeyValue(attributes)
                             updateAbilityUi(ability)
-                            setAttributeMapData(attributes)
                         }
                         attributeMapDecorator.setRemoveAction {
                             val row = attributeTable!!.selectedRow
                             attribute!!.remove(attributeTable!!.getValueAt(row, 0).toString())
                             val ability: Array<Array<Any?>>? = getMapKeyValue(attribute)
                             updateAbilityUi(ability)
-                            setAttributeMapData(attribute)
                         }
                         attributeTab.addTab("Table", attributeMapDecorator.createPanel())
                         attributeMap = LanguageTextField(JsonLanguage.INSTANCE, null, "")
@@ -147,8 +152,13 @@ class Setting : Configurable {
                         attributeTab.addTab("Map", attributeMapScroll)
                         bottom.add(attributeTab)
                     }
-                    power.add(top)
-                    power.add(bottom)
+                    val gbc = GridBagConstraints()
+                    gbc.anchor = GridBagConstraints.FIRST_LINE_START
+                    gbc.insets = Insets(5, 5, 5, 5)
+                    UiUtils.addGridBagComp(power, top, gbc,  0, 0, 1, 1,
+                        GridBagConstraints.BOTH, 0.3, 1.0)
+                    UiUtils.addGridBagComp(power, bottom, gbc,  1, 0, 1, 1,
+                        GridBagConstraints.BOTH, 0.7, 1.0)
                 }
                 tabs.addTab("Power", power)
             }
@@ -215,15 +225,21 @@ class Setting : Configurable {
             attribute = group[selectGroupKey]
             val ability: Array<Array<Any?>>? = getMapKeyValue(attribute)
             updateAbilityUi(ability)
-            setAttributeMapData(attribute)
         }
         attributeTable!!.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                if (attributeTable!!.selectedRow != -1) {
-                    attributeTable!!.editCellAt(attributeTable!!.selectedRow, attributeTable!!.selectedColumn, e)
+                if (attributeTable!!.hasFocus() && attributeTable!!.selectedRow != -1) {
+                    val row = attributeTable!!.selectedRow
+                    val col = attributeTable!!.selectedColumn
+                    if (attributeTable!!.isCellEditable(row, col)) {
+                        attributeTable!!.editCellAt(row, col)
+                    }
                 }
             }
         })
+        attributeTable!!.addPropertyChangeListener {
+            flushAttributeMap()
+        }
         attributeMap!!.document.addDocumentListener(object : DocumentListener {
             override fun documentChanged(event: DocumentEvent) {
                 if (attributeMap!!.isFocusOwner) {
@@ -279,7 +295,6 @@ class Setting : Configurable {
      */
     private fun clearAbilityUi() {
         updateAbilityUi(EMPTY_TWO_DIMENSION_ARRAY)
-        setAttributeMapData(EMPTY_MAP)
     }
 
     /**
@@ -290,7 +305,6 @@ class Setting : Configurable {
     private fun changeAbilityKey(oldk: String, newk: String) {
         val oldv = group[selectGroupKey]!!.remove(oldk)
         group[selectGroupKey]!![newk] = oldv!!
-        setAttributeMapData(group[selectGroupKey])
     }
 
     /**
@@ -300,7 +314,6 @@ class Setting : Configurable {
      */
     private fun changeAbilityValue(key: String, value: String) {
         group[selectGroupKey]!![key] = value
-        setAttributeMapData(group[selectGroupKey])
     }
 
     /**
@@ -309,19 +322,19 @@ class Setting : Configurable {
      * @return new string value
      */
     private fun doubleClick(value: Any): String {
-//        return new Messages.InputDialog("New name", "Rename", Messages.getQuestionIcon(), value.toString(), new NonEmptyInputValidator()).getInputString();
-        return JOptionPane.showInputDialog(
-            root,
-            "Modify the group name",
-            value
-        )
+        return ShowGet("Rename", value.toString()).get()()
     }
 
     /**
      * set map value to ability map panel
      * @param mapData ability map
      */
-    private fun setAttributeMapData(mapData: LinkedHashMap<String, String>?) {
+    private fun flushAttributeMap() {
+        val mapData = if (null != group[selectGroupKey]) {
+            group[selectGroupKey]
+        } else {
+            EMPTY_MAP
+        }
         attributeMap!!.text = GsonBuilder().setPrettyPrinting().create()
             .toJson(LinkedHashMap(mapData))
     }
@@ -414,10 +427,10 @@ class Setting : Configurable {
             if (Constant.AbilityType == attributeTable!!.getValueAt(row, 0).toString()) {
                 if (column == 1) {
                     val values = arrayOf(Constant.AbilityType_API, Constant.AbilityType_EXE)
-                    return DefaultCellEditor(JComboBox(values))
+                    return ComboBoxCellEditor(ComboBox(values))
                 }
             }
-            return super.getCellEditor(row, column)
+            return DefaultCellEditor(JBTextField())
         }
 
         override fun isCellEditable(row: Int, column: Int): Boolean {
@@ -429,5 +442,28 @@ class Setting : Configurable {
         private val EMPTY_TWO_DIMENSION_ARRAY = Array(0) { arrayOfNulls<Any>(0) }
         val EMPTY_MAP = LinkedHashMap<String, String>()
         private const val DISPLAY_NAME = "Interactive Assistant"
+    }
+
+    internal inner class ShowGet(private val _title: String, private val init: String) : DialogWrapper(true) {
+        private val label = JTextField()
+        override fun createCenterPanel(): JComponent {
+            label.text = this.init
+            return label
+        }
+
+        init {
+            init()
+            this.title = _title
+        }
+
+        fun get(): () -> String {
+            return fun (): String {
+                return if(this.showAndGet()){
+                    this.label.text
+                }else {
+                    this.init
+                }
+            }
+        }
     }
 }

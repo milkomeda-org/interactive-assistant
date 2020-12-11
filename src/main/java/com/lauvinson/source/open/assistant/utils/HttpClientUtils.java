@@ -177,7 +177,7 @@ public class HttpClientUtils {
         return getResult(httpPost);
     }
 
-    private static ArrayList<NameValuePair> covertParams2NVPS(Map<String, String> params) {
+    public static ArrayList<NameValuePair> covertParams2NVPS(Map<String, String> params) {
         ArrayList<NameValuePair> pairs = new ArrayList<>();
         for (Map.Entry<String, String> param : params.entrySet()) {
             if (param.getValue() != null) {
