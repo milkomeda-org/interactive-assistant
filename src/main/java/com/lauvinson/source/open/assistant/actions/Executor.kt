@@ -94,7 +94,6 @@ open class Executor(private var name: String, private var mapping: LinkedHashMap
             val size = Dimension(screen.width/3,screen.height/3)
             val panel = BorderLayoutPanel()
             val label = JTextPane()
-            label.contentType = "text/html"
             label.text = this.text
             val scroll = JBScrollPane()
             scroll.preferredSize = size
