@@ -119,15 +119,13 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
         };
         public static final thread_star[] s = new thread_star[c.length];
 
-        static {
-            for (int i = 0; i < s.length; i++) {
-                s[i] = new thread_star(rand(min_x, max_x), rand(min_y, max_y), rand(25, 40), (Math.PI / rand(25, 40)));
-            }
-        }
-
         draw_star() {
-            for (ToolWindowFactory.thread_star thread_star : s) {
-                thread_star.start();
+
+            for (int i = 0; i < s.length; i++) {
+                if (s[i] == null) {
+                    s[i] = new thread_star(rand(min_x, max_x), rand(min_y, max_y), rand(25, 40), (Math.PI / rand(25, 40)));
+                }
+                s[i].start();
             }
         }
 

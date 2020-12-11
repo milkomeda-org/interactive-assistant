@@ -38,6 +38,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -66,13 +67,17 @@ public class HttpClientUtils {
         return getResult(httpGet);
     }
 
-    public static String get(String url, Map<String, String > params) throws URISyntaxException {
+    public static URI buildURI(String url, Map<String, String > params) throws URISyntaxException {
         URIBuilder ub = new URIBuilder(url);
 
         ArrayList<NameValuePair> pairs = covertParams2NVPS(params);
         ub.setParameters(pairs);
 
-        HttpGet httpGet = new HttpGet(ub.build());
+        return ub.build();
+    }
+
+    public static String get(String url, Map<String, String > params) throws URISyntaxException {
+        HttpGet httpGet = new HttpGet(buildURI(url, params));
         return getResult(httpGet);
     }
 
@@ -177,7 +182,7 @@ public class HttpClientUtils {
         return getResult(httpPost);
     }
 
-    private static ArrayList<NameValuePair> covertParams2NVPS(Map<String, String> params) {
+    public static ArrayList<NameValuePair> covertParams2NVPS(Map<String, String> params) {
         ArrayList<NameValuePair> pairs = new ArrayList<>();
         for (Map.Entry<String, String> param : params.entrySet()) {
             if (param.getValue() != null) {

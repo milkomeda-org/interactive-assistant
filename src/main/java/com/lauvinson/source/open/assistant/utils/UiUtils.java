@@ -16,35 +16,23 @@
  * Equivalent description see [http://rem.mit-license.org/]
  */
 
-package com.lauvinson.source.open.assistant.states
+package com.lauvinson.source.open.assistant.utils;
 
-import com.intellij.icons.AllIcons
-import com.intellij.openapi.components.ServiceManager
-import com.lauvinson.source.open.assistant.actions.Executor
-import com.lauvinson.source.open.assistant.o.Constant
-import java.util.*
+import javax.swing.*;
+import java.awt.*;
 
-open class Runtime {
+public class UiUtils {
+    public static void addGridBagComp(JPanel panel, JComponent comp, GridBagConstraints gbc, int gridx,
+                               int gridy, int gridwidth, int gridheight,
+                               int fill, double weightx, double weighty) {
+        gbc.gridx = gridx;
+        gbc.gridy = gridy;
+        gbc.gridwidth = gridwidth;
+        gbc.gridheight = gridheight;
+        gbc.fill = fill;
+        gbc.weightx = weightx;
+        gbc.weighty = weighty;
 
-    companion object {
-        private val configService = ServiceManager.getService(ConfigService::class.java)
-        private val list: ArrayList<Executor> = ArrayList()
-
-        fun flushGroups(){
-            list.clear()
-            val group = configService.state?.group
-            group?.forEach { m ->
-                val type = m.value[Constant.AbilityType]
-                if (type?.equals(Constant.AbilityType_API) == true) {
-                    list.add(Executor(m.key, m.value, AllIcons.General.Web))
-                }else {
-                    list.add(Executor(m.key, m.value, AllIcons.Actions.Execute))
-                }
-            }
-        }
-
-        fun getGroups(): ArrayList<Executor> {
-            return list
-        }
+        panel.add(comp, gbc);
     }
 }

@@ -24,6 +24,10 @@
 </ul>
 <hr />
 
+<h3>v0.0.8</h3>
+<ul>
+<li>fix bugs</li>
+</ul>
 <h3>v0.0.7</h3>
 <ul>
 <li>remake ui</li>
@@ -35,6 +39,7 @@
 </ul>
 <ul>
 <li>supported 202</li>
+</ul>
 <h3>v0.0.4</h3>
 <ul>
 <li>supported exe and api</li>
