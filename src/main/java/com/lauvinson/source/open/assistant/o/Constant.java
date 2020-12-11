@@ -21,6 +21,7 @@ package com.lauvinson.source.open.assistant.o;
 import java.util.LinkedHashMap;
 
 public class Constant {
+    public static final String SYS_PREFIX = "$";
     public static final String AbilityType = "$type";
     public static final String AbilityType_API = "api";
     public static final String AbilityType_EXE = "exe";
