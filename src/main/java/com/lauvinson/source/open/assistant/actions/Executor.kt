@@ -33,11 +33,8 @@ import com.intellij.util.ui.components.BorderLayoutPanel
 import com.lauvinson.source.open.assistant.o.Constant
 import com.lauvinson.source.open.assistant.utils.HttpClientUtils
 import com.lauvinson.source.open.assistant.utils.JsonUtils
-import com.lauvinson.source.open.assistant.utils.OkHttpUtils
 import com.lauvinson.source.open.assistant.utils.ShTerminalRunner
-import okhttp3.Response
 import org.apache.commons.lang.StringUtils
-import org.apache.http.HttpHeaders
 import org.apache.http.util.TextUtils
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -76,7 +73,7 @@ open class Executor(private var name: String, private var mapping: LinkedHashMap
                         params[entry.key] = entry.value
                     }
                 }
-                val response = OkHttpUtils.get(HttpClientUtils.buildURI(it, params).toString())
+                val response = HttpClientUtils.get(HttpClientUtils.buildURI(it, params).toString())
                 showPopupBalloon(this.name, response)
             }
         }else if (Constant.AbilityType_EXE == mapping[Constant.AbilityType]) {
@@ -98,23 +95,23 @@ open class Executor(private var name: String, private var mapping: LinkedHashMap
         }
     }
 
-    private fun showPopupBalloon(name: String, response: Response) {
+    private fun showPopupBalloon(name: String, response: List<String>) {
         SampleDialogWrapper(name, response).showAndGet()
     }
 
-    private inner class SampleDialogWrapper(private val _title: String, private val response: Response) : DialogWrapper(true) {
+    private inner class SampleDialogWrapper(private val _title: String, private val response: List<String>) : DialogWrapper(true) {
         override fun createCenterPanel(): JComponent {
             val screen = Toolkit.getDefaultToolkit().screenSize
             val size = Dimension(screen.width/3,screen.height/3)
             val panel = BorderLayoutPanel()
-            var text = response.body().string().trim()
+            var text = response[0].trim()
             val lang =
                 when {
-                    response.header(HttpHeaders.CONTENT_TYPE).startsWith("application/json") -> {
-                        text = JsonUtils.format(text)
+                    response[1].startsWith("application/json") -> {
+                        text = text.let { JsonUtils.format(it) }
                         JsonLanguage.INSTANCE
                     }
-                    response.header(HttpHeaders.CONTENT_TYPE).startsWith("text/html") -> {
+                    response[1].startsWith("text/html") -> {
                         HTMLLanguage.INSTANCE
                     }
                     else -> {
