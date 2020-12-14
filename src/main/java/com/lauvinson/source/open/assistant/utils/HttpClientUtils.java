@@ -20,6 +20,7 @@ package com.lauvinson.source.open.assistant.utils;
 
 import com.google.gson.Gson;
 import com.lauvinson.source.open.assistant.o.ApiResult;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.EntityBuilder;
@@ -42,6 +43,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class HttpClientUtils {
@@ -62,9 +64,9 @@ public class HttpClientUtils {
         return HttpClients.custom().setConnectionManager(cm).build();
     }
 
-    public static String get(String url) {
+    public static List<String> get(String url) {
         HttpGet httpGet = new HttpGet(url);
-        return getResult(httpGet);
+        return getResultWithContentType(httpGet);
     }
 
     public static URI buildURI(String url, Map<String, String > params) throws URISyntaxException {
@@ -191,6 +193,35 @@ public class HttpClientUtils {
         }
 
         return pairs;
+    }
+
+    public static final List<String> unknown = new ArrayList<>(2) {{
+        add("unknown");
+        add("text");
+    }};
+    private static List<String> getResultWithContentType(HttpRequestBase request) {
+        // CloseableHttpClient httpClient = HttpClients.createDefault();
+        CloseableHttpClient httpClient = getHttpClient();
+        try {
+            CloseableHttpResponse response = httpClient.execute(request);
+            // response.getStatusLine().getStatusCode();
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                // long len = entity.getContentLength();
+                Header contentType = entity.getContentType();
+                String result = EntityUtils.toString(entity, UTF_8);
+                response.close();
+                // httpClient.close();
+                return new ArrayList<>(2) {{
+                    add(result);
+                    add(contentType.getValue());
+                }};
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return unknown;
     }
 
     private static String getResult(HttpRequestBase request) {
