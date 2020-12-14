@@ -85,8 +85,8 @@
     <!-- settings panel -->
     <applicationConfigurable instance="com.lauvinson.source.open.assistant.ui.Setting" />
     <!-- tool -->
-    <toolWindow id="Assistant" anchor="right" factoryClass="com.lauvinson.source.open.assistant.ui.ToolWindowFactory"
-                icon="/icons/pluginIcon.svg"/>
+<!--    <toolWindow id="Assistant" anchor="right" factoryClass="com.lauvinson.source.open.assistant.ui.ToolWindowFactory"-->
+<!--                icon="/icons/pluginIcon.svg"/>-->
   </extensions>
 
   <actions>
@@ -94,9 +94,12 @@
     <group id="EditMenu.Abilities" class="com.lauvinson.source.open.assistant.actions.EditorMenu" text="Abilities" icon="/icons/pluginIcon.svg" popup="true">
       <add-to-group group-id="EditMenu" anchor="first"/>
     </group>
-      <group id="Editor.Abilities" class="com.lauvinson.source.open.assistant.actions.EditorMenu" text="Abilities" icon="/icons/pluginIcon.svg" popup="true">
-          <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-      </group>
+    <group id="Editor.Abilities" class="com.lauvinson.source.open.assistant.actions.EditorMenu" text="Abilities" icon="/icons/pluginIcon.svg" popup="true">
+        <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+    </group>
+    <group id="Project.Abilities" class="com.lauvinson.source.open.assistant.actions.EditorMenu" text="Abilities" icon="/icons/pluginIcon.svg" popup="true">
+      <add-to-group group-id="ProjectViewPopupMenu"/>
+    </group>
   </actions>
 
 </idea-plugin>

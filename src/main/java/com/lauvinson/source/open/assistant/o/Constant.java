@@ -33,7 +33,9 @@ public class Constant {
     public static final LinkedHashMap<String, LinkedHashMap<String, String>> AbilityExample = new LinkedHashMap<>(1) {{
         LinkedHashMap<String, String> yd = new LinkedHashMap<>(1) {{
             put(AbilityType, AbilityType_API);
-            put(Ability_URL, "http://fanyi.youdao.com/translate?&doctype=json&type=AUTO");
+            put(Ability_URL, "http://fanyi.youdao.com/translate");
+            put("doctype", "json");
+            put("type", "AUTO");
             put(Ability_URL_ARGS_NAME, "i");
         }};
         put("有道翻译", yd);

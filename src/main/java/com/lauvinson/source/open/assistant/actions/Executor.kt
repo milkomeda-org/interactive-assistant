@@ -31,11 +31,10 @@ import com.intellij.ui.LanguageTextField
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.lauvinson.source.open.assistant.o.Constant
+import com.lauvinson.source.open.assistant.service.EXEService
 import com.lauvinson.source.open.assistant.utils.HttpClientUtils
 import com.lauvinson.source.open.assistant.utils.JsonUtils
-import com.lauvinson.source.open.assistant.utils.ShTerminalRunner
 import org.apache.commons.lang.StringUtils
-import org.apache.http.util.TextUtils
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.util.*
@@ -52,20 +51,15 @@ open class Executor(private var name: String, private var mapping: LinkedHashMap
         val openProjects: Array<Project> = projectManager.openProjects
         val project = if (openProjects.isNotEmpty()) openProjects[0] else projectManager.defaultProject
         if (Constant.AbilityType_API == mapping[Constant.AbilityType]) {
-            mapping[Constant.Ability_URL]?.let {
+            mapping[Constant.Ability_URL]?.let { it ->
                 if (StringUtils.isBlank(mapping[Constant.Ability_URL_ARGS_NAME])) {
                     return
                 }
-                val mEditor = e.getData(PlatformDataKeys.EDITOR) ?: return
-                val model = mEditor.selectionModel
-                val selectedText = model.selectedText
-                if (TextUtils.isEmpty(selectedText)) {
-                    return
-                }
+
                 val params = HashMap<String, String>()
                 for (entry in mapping.entries) {
                     if (Constant.Ability_URL_ARGS_NAME == entry.key) {
-                        params[mapping[Constant.Ability_URL_ARGS_NAME].toString()] = selectedText.toString()
+                        (e.getData(PlatformDataKeys.EDITOR)?.selectionModel?.selectedText).also { params[mapping[Constant.Ability_URL_ARGS_NAME].toString()] = it.toString() }
                     } else {
                         if (entry.key.startsWith(Constant.SYS_PREFIX)) {
                             continue
@@ -77,21 +71,7 @@ open class Executor(private var name: String, private var mapping: LinkedHashMap
                 showPopupBalloon(this.name, response)
             }
         }else if (Constant.AbilityType_EXE == mapping[Constant.AbilityType]) {
-            mapping[Constant.Ability_EXE_PATH]?.let {
-                val sb = StringBuilder(it)
-                for (entry in mapping.entries) {
-                    if (Constant.Ability_FILE_ARGS_NAME == entry.key) {
-                        sb.append(" -${entry.value}=${EditorMenu.virtualFile?.path.toString()}")
-                    } else {
-                        if (entry.key.startsWith(Constant.SYS_PREFIX)) {
-                            continue
-                        }
-                        sb.append(" -${entry.key}=${entry.value}")
-                    }
-                }
-                val runner = ShTerminalRunner(project)
-                runner.run(sb.toString(), "~", EditorMenu.virtualFile?.name.toString())
-            }
+           EXEService.execute(project, mapping)
         }
     }
 

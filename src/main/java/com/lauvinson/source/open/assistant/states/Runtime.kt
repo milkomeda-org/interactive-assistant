@@ -19,32 +19,44 @@
 package com.lauvinson.source.open.assistant.states
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.components.ServiceManager
 import com.lauvinson.source.open.assistant.actions.Executor
 import com.lauvinson.source.open.assistant.o.Constant
-import java.util.*
+import org.apache.http.util.TextUtils
 
 open class Runtime {
 
     companion object {
         private val configService = ServiceManager.getService(ConfigService::class.java)
         private val list: ArrayList<Executor> = ArrayList()
+        private val executeList: ArrayList<Executor> = ArrayList()
 
         fun flushGroups(){
             list.clear()
+            executeList.clear()
             val group = configService.state?.group
             group?.forEach { m ->
                 val type = m.value[Constant.AbilityType]
                 if (type?.equals(Constant.AbilityType_API) == true) {
                     list.add(Executor(m.key, m.value, AllIcons.General.Web))
                 }else {
-                    list.add(Executor(m.key, m.value, AllIcons.Actions.Execute))
+                    val exe = Executor(m.key, m.value, AllIcons.Actions.Execute)
+                    list.add(exe)
+                    executeList.add(exe)
                 }
             }
         }
 
-        fun getGroups(): ArrayList<Executor> {
-            return list
+        fun getGroups(e: AnActionEvent?): ArrayList<Executor> {
+            val selectedText = e?.getData(PlatformDataKeys.EDITOR)?.selectionModel?.selectedText
+            return if (e?.place == ActionPlaces.PROJECT_VIEW_POPUP || TextUtils.isEmpty(selectedText)) {
+                executeList
+            }else {
+                list
+            }
         }
     }
 }

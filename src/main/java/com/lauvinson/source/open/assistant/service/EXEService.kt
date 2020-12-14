@@ -16,34 +16,30 @@
  * Equivalent description see [http://rem.mit-license.org/]
  */
 
-package com.lauvinson.source.open.assistant.actions
+package com.lauvinson.source.open.assistant.service
 
-import com.intellij.openapi.actionSystem.ActionGroup
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.vfs.VirtualFile
-import com.lauvinson.source.open.assistant.states.Runtime
+import com.intellij.openapi.project.Project
+import com.lauvinson.source.open.assistant.actions.EditorMenu
+import com.lauvinson.source.open.assistant.o.Constant
+import com.lauvinson.source.open.assistant.utils.ShTerminalRunner
+import java.util.LinkedHashMap
 
-
-/**
- * @License Apache2
- * @since 0.0.1
- * ability executor
- * @author created by vinson on 2019/6/28
- */
-open class EditorMenu : ActionGroup() {
-
-    companion object {
-        var virtualFile : VirtualFile? = null
-    }
-
-    override fun getChildren(e: AnActionEvent?): Array<AnAction> {
-        val list = Runtime.getGroups(e)
-        if (list.size < 1) {
-            Runtime.flushGroups()
+object EXEService {
+    fun execute(project: Project, mapping: LinkedHashMap<String, String>) {
+        mapping[Constant.Ability_EXE_PATH]?.let {
+            val sb = StringBuilder(it)
+            for (entry in mapping.entries) {
+                if (Constant.Ability_FILE_ARGS_NAME == entry.key) {
+                    sb.append(" -${entry.value}=${EditorMenu.virtualFile?.path.toString()}")
+                } else {
+                    if (entry.key.startsWith(Constant.SYS_PREFIX)) {
+                        continue
+                    }
+                    sb.append(" -${entry.key}=${entry.value}")
+                }
+            }
+            val runner = ShTerminalRunner(project)
+            runner.run(sb.toString(), "~", EditorMenu.virtualFile?.name.toString())
         }
-        virtualFile = e?.getData(PlatformDataKeys.VIRTUAL_FILE)
-        return list.toArray(arrayOf())
     }
 }
