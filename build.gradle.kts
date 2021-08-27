@@ -66,14 +66,14 @@ detekt {
 }
 
 tasks {
-    // Set the compatibility versions to 15
+    // Set the compatibility versions to 11
     withType<JavaCompile> {
-        sourceCompatibility = "15"
-        targetCompatibility = "15"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
         options.encoding = "UTF-8"
     }
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "15"
+        kotlinOptions.jvmTarget = "11"
     }
 
     withType<Detekt> {
