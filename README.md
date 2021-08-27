@@ -1,6 +1,13 @@
 # Interactive-assistant
-<p>It's up to you to use some of the interchangeable interfaces to provide more efficient and timely response, and we'll add more extensible features in the future.</p>
-<p>Support or Suggestions can be found at <a href="https://open.source.lauvinson.com">open.source.lauvinson.com</a></p>
+
+<!-- Plugin description -->
+It's up to you to use some of the interchangeable interfaces to provide more efficient and timely response, and we'll add more extensible features in the future.
+
+Support or Suggestions can be found at <a href="https://open.source.lauvinson.com">open.source.lauvinson.com</a>
+
+[gh:template]: https://help.github.com/en/enterprise/2.20/user/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template
+<!-- Plugin description end -->
+
 <br />
 <p>tips:</p>
 <p>if ability_type is exe then exe_path and file_args_name are required</p>

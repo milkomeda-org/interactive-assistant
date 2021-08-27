@@ -30,8 +30,8 @@ public class Constant {
     public static final String Ability_FILE_ARGS_NAME = "$args_name";
     public static final String Ability_URL_ARGS_NAME = "$args_name";
 
-    public static final LinkedHashMap<String, LinkedHashMap<String, String>> AbilityExample = new LinkedHashMap<>(1) {{
-        LinkedHashMap<String, String> yd = new LinkedHashMap<>(1) {{
+    public static final LinkedHashMap<String, LinkedHashMap<String, String>> AbilityExample = new LinkedHashMap(1) {{
+        LinkedHashMap<String, String> yd = new LinkedHashMap(1) {{
             put(AbilityType, AbilityType_API);
             put(Ability_URL, "http://fanyi.youdao.com/translate?&doctype=json&type=AUTO");
             put(Ability_URL_ARGS_NAME, "i");
