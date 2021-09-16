@@ -19,15 +19,14 @@
 package com.lauvinson.source.open.assistant.states
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.application.ApplicationManager
 import com.lauvinson.source.open.assistant.actions.Executor
 import com.lauvinson.source.open.assistant.o.Constant
-import java.util.*
 
 open class Runtime {
 
     companion object {
-        private val configService = ServiceManager.getService(ConfigService::class.java)
+        private val configService = ApplicationManager.getApplication().getService(ConfigService::class.java)
         private val list: ArrayList<Executor> = ArrayList()
 
         fun flushGroups(){

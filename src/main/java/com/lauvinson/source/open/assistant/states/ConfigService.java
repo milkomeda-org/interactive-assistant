@@ -18,6 +18,7 @@
 
 package com.lauvinson.source.open.assistant.states;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -26,10 +27,10 @@ import org.jetbrains.annotations.NotNull;
 
 @State(name = "private-interactive-assistant", storages = {@Storage(value = "$APP_CONFIG$/private-interactive-assistant.xml")})
 public class ConfigService implements PersistentStateComponent<Config> {
-    private Config config = new Config();
+    private volatile Config config = new Config();
 
     public static ConfigService getInstance() {
-        return ServiceManager.getService(ConfigService.class);
+        return ApplicationManager.getApplication().getService(ConfigService.class);
     }
 
     @Override

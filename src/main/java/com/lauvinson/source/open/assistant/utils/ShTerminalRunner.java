@@ -87,7 +87,6 @@ public class ShTerminalRunner {
         if (!(widget instanceof ShellTerminalWidget)) return null;
         if (!content.getDisplayName().equals(commandName)) return null;
         ShellTerminalWidget shellTerminalWidget = (ShellTerminalWidget)widget;
-        if (!shellTerminalWidget.getTypedShellCommand().isEmpty() || shellTerminalWidget.hasRunningCommands()) return null;
         return Pair.create(content, shellTerminalWidget);
     }
 }
