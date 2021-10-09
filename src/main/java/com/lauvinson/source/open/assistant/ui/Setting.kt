@@ -61,7 +61,7 @@ class Setting : Configurable {
     private var attribute: LinkedHashMap<String, String>? = LinkedHashMap()
     private var selectGroupKey = ""
     private var root: JPanel? = null
-    private var groupList: JList<Any>? = null
+    private var groupList: JBList<Any>? = null
     private var attributeTable: AbilityTable? = null
     private var attributeTableModel: AbilityTableModel? = null
     private var attributeMap: EditorTextField? = null
@@ -82,16 +82,16 @@ class Setting : Configurable {
             //tabs
             tabs = JBTabbedPane()
             tabs.run{
-                //power
+                //abilities
                 val gbl = GridBagLayout()
-                val power = JPanel(gbl)
-                power.run{
+                val abilities = JPanel(gbl)
+                abilities.run{
                     //top
                     val top = JPanel(BorderLayout())
                     top.run{
                         //groupLIst
                         val groupListModel = CollectionListModel<Any>()
-                        groupList = JBList<Any>(groupListModel)
+                        groupList = JBList(groupListModel)
                         val groupListDecorator = ToolbarDecorator.createDecorator(groupList as JBList<Any>)
                         groupListDecorator.disableUpDownActions()
                         groupListDecorator.setAddAction {
@@ -148,19 +148,20 @@ class Setting : Configurable {
                         attributeMap = LanguageTextField(JsonLanguage.INSTANCE, null, "")
                         (attributeMap as LanguageTextField).setOneLineMode(false)
                         val attributeMapScroll: JScrollPane = JBScrollPane(attributeMap)
-                        attributeMapScroll.preferredSize = power.preferredSize
+                        attributeMapScroll.preferredSize = abilities.preferredSize
                         attributeTab.addTab("Map", attributeMapScroll)
                         bottom.add(attributeTab)
                     }
                     val gbc = GridBagConstraints()
                     gbc.anchor = GridBagConstraints.FIRST_LINE_START
                     gbc.insets = Insets(5, 5, 5, 5)
-                    UiUtils.addGridBagComp(power, top, gbc,  0, 0, 1, 1,
+                    UiUtils.addGridBagComp(abilities, top, gbc,  0, 0, 1, 1,
                         GridBagConstraints.BOTH, 0.3, 1.0)
-                    UiUtils.addGridBagComp(power, bottom, gbc,  1, 0, 1, 1,
+                    UiUtils.addGridBagComp(abilities, bottom, gbc,  1, 0, 1, 1,
                         GridBagConstraints.BOTH, 0.7, 1.0)
                 }
-                tabs.addTab("Power", power)
+                tabs.addTab("Abilities", abilities)
+
             }
             root!!.add(tabs)
         }
@@ -223,12 +224,13 @@ class Setting : Configurable {
             selectGroupKey = groupList!!.selectedValue.toString()
             // show map
             attribute = group[selectGroupKey]
-            val ability: Array<Array<Any?>>? = getMapKeyValue(attribute)
-            updateAbilityUi(ability)
+            val abilities: Array<Array<Any?>>? = getMapKeyValue(attribute)
+            updateAbilityUi(abilities)
         }
         attributeTable!!.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                if (attributeTable!!.hasFocus() && attributeTable!!.selectedRow != -1) {
+                // attribute table cell to be editable
+                if (e.clickCount == 2 && attributeTable!!.hasFocus() && attributeTable!!.selectedRow != -1) {
                     val row = attributeTable!!.selectedRow
                     val col = attributeTable!!.selectedColumn
                     if (attributeTable!!.isCellEditable(row, col)) {
@@ -256,8 +258,8 @@ class Setting : Configurable {
                         }
                         attributes!!.clear()
                         attributes.putAll(map)
-                        val ability: Array<Array<Any?>>? = getMapKeyValue(map)
-                        updateAbilityUi(ability)
+                        val abilities: Array<Array<Any?>>? = getMapKeyValue(map)
+                        updateAbilityUi(abilities)
                     }
                 }
             }
@@ -281,7 +283,7 @@ class Setting : Configurable {
     }
 
     /**
-     * update the ui of ability panel
+     * update the ui of abilities panel
      * @param data table data
      */
     private fun updateAbilityUi(data: Array<Array<Any?>>?) {
@@ -291,24 +293,24 @@ class Setting : Configurable {
     }
 
     /**
-     * release the data and clean the ui for ability panel
+     * release the data and clean the ui for abilities panel
      */
     private fun clearAbilityUi() {
         updateAbilityUi(EMPTY_TWO_DIMENSION_ARRAY)
     }
 
     /**
-     * change key of the map data of ability
-     * @param oldk before changing key
-     * @param newk after changed key
+     * change key of the map data of abilities
+     * @param oldKey before changing key
+     * @param newKey after changed key
      */
-    private fun changeAbilityKey(oldk: String, newk: String) {
-        val oldv = group[selectGroupKey]!!.remove(oldk)
-        group[selectGroupKey]!![newk] = oldv!!
+    private fun changeAbilityKey(oldKey: String, newKey: String) {
+        val oldValue = group[selectGroupKey]!!.remove(oldKey)
+        group[selectGroupKey]!![newKey] = oldValue!!
     }
 
     /**
-     * change the value of the map data of ability
+     * change the value of the map data of abilities
      * @param key map key
      * @param value new value
      */
@@ -326,8 +328,7 @@ class Setting : Configurable {
     }
 
     /**
-     * set map value to ability map panel
-     * @param mapData ability map
+     * set map value to abilities map panel
      */
     private fun flushAttributeMap() {
         val mapData = if (null != group[selectGroupKey]) {
@@ -340,12 +341,12 @@ class Setting : Configurable {
     }
 
     /**
-     * ability table model extends #[AbstractTableModel]
+     * abilities table model extends #[AbstractTableModel]
      */
     internal inner class AbilityTableModel  // 下述方法是重写AbstractTableModel中的方法，其主要用途是被JTable对象调用，以便在表格中正确的显示出来。程序员必须根据采用的数据类型加以恰当实现。
         : AbstractTableModel() {
         // 表格中第一行所要显示的内容存放在字符串数组columnNames中
-        private var abilityColumnNames = arrayOf("Key", "Value")
+        private var abilitiesColumnNames = arrayOf("Key", "Value")
 
         // 表格中各行的内容保存在二维数组data中
         private var data: Array<Array<Any?>>? = null
@@ -356,7 +357,7 @@ class Setting : Configurable {
 
         // 获得列的数目
         override fun getColumnCount(): Int {
-            return abilityColumnNames.size
+            return abilitiesColumnNames.size
         }
 
         // 获得行的数目
@@ -366,7 +367,7 @@ class Setting : Configurable {
 
         // 获得某列的名字，而目前各列的名字保存在字符串数组columnNames中
         override fun getColumnName(col: Int): String {
-            return abilityColumnNames[col]
+            return abilitiesColumnNames[col]
         }
 
         // 获得某行某列的数据，而数据保存在对象数组data中
@@ -420,7 +421,7 @@ class Setting : Configurable {
     }
 
     /**
-     * ability table panel extends #[JBTable]
+     * abilities table panel extends #[JBTable]
      */
     internal inner class AbilityTable(model: TableModel?) : JBTable(model) {
         override fun getCellEditor(row: Int, column: Int): TableCellEditor {
@@ -444,7 +445,7 @@ class Setting : Configurable {
         private const val DISPLAY_NAME = "Interactive Assistant"
     }
 
-    internal inner class ShowGet(private val _title: String, private val init: String) : DialogWrapper(true) {
+    internal inner class ShowGet(_title: String, private val init: String) : DialogWrapper(true) {
         private val label = JTextField()
         override fun createCenterPanel(): JComponent {
             label.text = this.init
